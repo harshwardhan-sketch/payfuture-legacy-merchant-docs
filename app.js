@@ -195,6 +195,7 @@ P.signing = f => {
     <a class="tile" href="#" data-jump="hmac"><span class="tag">One method for all requests</span><b>Option A · Signature header</b><span>Sign the whole request body with HMAC-SHA256 and send it in the <code>X-Callback-Signature</code> header. The same code works for every request type.</span></a>
     <a class="tile" href="#" data-jump="body-hash"><span class="tag">Per request type</span><b>Option B · Body hash</b><span>Join specific fields with <code>~</code>, add your secret and send the SHA-256 in the <code>hash</code> field. Each request type has its own field order.</span></a>
   </div>
+  <div class="callout ok"><p><b>New: <a href="#/${f}/playground">Hash playground</a>.</b> Build a hash piece by piece, sign a body with HMAC, and let the hash detective tell you why yours doesn't match.</p></div>
   <div class="callout"><p><b>Callbacks carry a body hash.</b> When PayFuture calls your <code>notificationUrl</code>, check its <a href="#" data-jump="callback-recipes">callback hash</a>, whichever option you use to sign your requests.</p></div>
 
   <section id="hmac"><h2>Option A · Signature header (HMAC)</h2>
@@ -381,6 +382,9 @@ function filterErrors() {
 
 /* ---------- after every render ---------- */
 function afterRender(pageId, arg) {
+  /* soft fade-in for the new page content */
+  const m = document.querySelector('#app main') || document.getElementById('app');
+  m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
   /* wrap tables so they fill the frame and scroll sideways on small screens */
   document.querySelectorAll('#app table').forEach(t => { if (!t.parentElement.classList.contains('tw')) { const w = document.createElement('div'); w.className = 'tw'; t.replaceWith(w); w.appendChild(t); } });
   if (pageId === 'signing') initCalc(document.querySelector('.layout')?.dataset.sec, arg);
@@ -425,7 +429,10 @@ document.addEventListener('input', e => {
 document.getElementById('menuBtn').onclick = () => document.body.classList.toggle('menu');
 document.getElementById('themeBtn').onclick = () => {
   const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-  r.dataset.theme = dark ? 'light' : 'dark'; try { localStorage.setItem('pf-theme', r.dataset.theme); } catch (_) {}
+  /* switch colours instantly: no element should animate its colours on a theme change */
+  r.classList.add('theme-switching'); r.dataset.theme = dark ? 'light' : 'dark'; void r.offsetWidth;
+  setTimeout(() => r.classList.remove('theme-switching'), 0);
+  try { localStorage.setItem('pf-theme', r.dataset.theme); } catch (_) {}
 };
 try { const t = localStorage.getItem('pf-theme'); if (t) document.documentElement.dataset.theme = t; } catch (_) {}
 

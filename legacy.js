@@ -28,7 +28,7 @@ const legacyOnly = o => Object.values(o).filter(x => x.flows.has(LF));
 LG.start = () => {
   const mk = LEGACY_MARKETS();
   const flag = c => (FLAGS_SITE.find(f => f[0] === c) || [])[1];
-  return `<div class="pf-banner">${fig('payins-hero.png', 'PayFuture Gateway')}<div class="pf-banner-text"><h1>Legacy · PayFuture Gateway</h1><p>Integration guide and API reference for merchants connecting directly to the PayFuture Gateway (IG).</p></div></div>
+  return `<div class="pf-banner">${fig('payins-hero.webp', 'PayFuture Gateway')}<div class="pf-banner-text"><h1>Legacy · PayFuture Gateway</h1><p>Integration guide and API reference for merchants connecting directly to the PayFuture Gateway (IG).</p></div></div>
 <p class="lead">Accept local payments and send payouts across ${mk.length} emerging markets through one endpoint. Built for gaming, forex, P2P and e-commerce merchants.</p>
 <div class="home-stats" style="padding:0;margin:0 0 8px">
   <div><b>${mk.length}</b><span>markets</span></div>

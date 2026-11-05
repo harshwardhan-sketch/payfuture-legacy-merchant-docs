@@ -20,8 +20,10 @@ Tools: site-wide search (header button, Ctrl/⌘ K or `/`), signature (HMAC) and
 - `app.js`: router, API-page renderer, signing page, SHA-256 / HMAC-SHA256 in pure JS
 - `guide.js`, `legacy.js`, `home.js`, `about.js`: guide pages, Legacy navigation, home page, company pages
 - `search.js`: site-wide search (index built in the browser from every page and every error code)
+- `playground.js`: Hash playground (body hash builder, HMAC signature header, hash detective), using the recipes in `data.js`
+- `motion.js`: light animations (reading progress, back to top, cards easing in, stats count-up); all off when the visitor prefers reduced motion
 - `data.js`: **generated** from document.paygate10.com: field tables, hash recipes, examples, error codes
-- `assets/`: logo, images, product data from coverage.payfuture.net
+- `assets/`: logo, images, product data from coverage.payfuture.net. Photos are WebP, at most 1400px wide; keep new ones small (under ~250 KB)
 - `tools/refresh.sh`: re-imports `data.js` from the live docs
 - `REVIEW.md`: **internal, not published** (in `.gitignore`): problems found in the live docs
 

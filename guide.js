@@ -156,6 +156,7 @@ G.reconciliation = () => `<h1>Balance &amp; reconciliation</h1>
 
 G['hash-help'] = () => `<h1>Fixing hash errors</h1>
 <p class="lead">“hash does not match” is the most common integration error. It almost always comes from one of the causes below.</p>
+<div class="callout ok"><p><b>Fastest fix:</b> paste your hash into the <a href="#/legacy/playground">hash playground</a>. Its hash detective tries every cause below and tells you which one it is.</p></div>
 ${table(['Cause', 'How to spot it', 'Fix'], [
   ['<b>Wrong recipe</b>', 'You used the hosted recipe for a seamless request, or another method\'s recipe.', 'Recipes differ per request type, mode, method and country. Copy the exact one from your platform\'s API reference.'],
   ['<b>Fields in the wrong order</b>', 'Same fields, different order.', 'Follow the recipe order exactly — e.g. some recipes place <code>midsecret</code> in the middle.'],

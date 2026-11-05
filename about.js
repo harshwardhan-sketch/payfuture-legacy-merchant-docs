@@ -13,20 +13,20 @@ const FLAGS_SITE = [['India', 'india.svg'], ['Pakistan', 'pakistan.svg'], ['Bang
   ['Philippines', 'Philippines-1.png'], ['Malaysia', 'Malaysia.svg'], ['Egypt', 'egypt.svg'], ['Morocco', 'Morocco-global-reach-flag-1.svg'], ['Nigeria', 'Nigeria-flag.svg'],
   ['Kenya', 'kenya.svg'], ['South Africa', 'sf.svg'], ['Brazil', 'brazil.svg'], ['Argentina', 'argentina.svg'], ['Mexico', 'mexico.svg']];
 const LOGOS = [['Ace Money Transfer', 'Ace-Money-Transfer.svg'], ['APA', 'APA.svg'], ['Faster Payments', 'Faster-Payments.svg'], ['Unigox', 'Unigox.svg'], ['Tamatem', 'Tamatem-1.svg'], ['Profee', 'Profee-1.svg'], ['Pagsmile', 'Pagsmile-1.svg']];
-const TEAM = [['Manpreet Haer', 'Co-Founder & Chief Executive Officer', 'Manpreet-haer.png'], ['Jon Bowman', 'Chief Technology Officer', 'Jon-Bowman.png'],
+const TEAM = [['Manpreet Haer', 'Co-Founder & Chief Executive Officer', 'Manpreet-haer.webp'], ['Jon Bowman', 'Chief Technology Officer', 'Jon-Bowman.webp'],
   ['Sid Gautam', 'Chief Revenue Officer', 'Sid-2.webp'], ['Saaly Temirkanov', 'Chief Operating Officer', 'Saaly.webp']];
 const SOLUTIONS = [
-  ['sol-payins', 'Pay-ins', 'Accept payments with 70+ local payment methods across emerging markets.', 'payins-hero.png'],
+  ['sol-payins', 'Pay-ins', 'Accept payments with 70+ local payment methods across emerging markets.', 'payins-hero.webp'],
   ['sol-payouts', 'Payouts', 'Fast, secure, localised payouts to wallets, cards and bank accounts.', 'payouts-banner.webp'],
-  ['sol-crossborder', 'Cross-border payments', 'Compliant fund movement, FX and repatriation across complex corridors.', 'crossborder-hero.png'],
+  ['sol-crossborder', 'Cross-border payments', 'Compliant fund movement, FX and repatriation across complex corridors.', 'crossborder-hero.webp'],
   ['sol-stablecoin', 'Stablecoin payments', 'Settle cross-border faster on regulated stablecoin rails.', 'Stablecoin-copy.webp'],
-  ['sol-mass', 'Global mass payments', 'Pay thousands of recipients across markets in a single run.', 'mass-hero.jpg'],
-  ['sol-optimisation', 'Authorisation optimisation', 'Smart routing and retries for higher approval rates.', 'optimisation-hero.png'],
+  ['sol-mass', 'Global mass payments', 'Pay thousands of recipients across markets in a single run.', 'mass-hero.webp'],
+  ['sol-optimisation', 'Authorisation optimisation', 'Smart routing and retries for higher approval rates.', 'optimisation-hero.webp'],
   ['sol-reporting', 'Reporting & analytics', '24/7 monitoring, real-time dashboards and alerts.', 'real-time-payments-bg.webp'],
 ];
 
 /* ---------- pages ---------- */
-G.about = () => `${banner('about-hero.jpg', 'The future of payments is now', 'Leading payment solutions for emerging markets')}
+G.about = () => `${banner('about-hero.webp', 'The future of payments is now', 'Leading payment solutions for emerging markets')}
 <p class="lead">At PayFuture, we’re transforming the landscape of digital payments for online merchants, SMEs, and enterprises across emerging markets. With our innovative technology and deep understanding of local markets, we bridge the gap between global businesses and high-growth economies, enabling seamless, secure, and efficient payment solutions.</p>
 <h2>PayFuture by numbers</h2>
 <div class="grid3">
@@ -71,7 +71,7 @@ ${feat([
 <p>With PayFuture, businesses can manage cross-border settlements with fast, secure and cost-effective onshore and offshore settlement, receiving funds in their preferred currency.</p>
 ${srcLine(WEB.solutions, 'payfuture.net/solutions')}`;
 
-G['sol-payins'] = () => `${banner('payins-hero.png', 'Accept payments globally with local payment methods')}
+G['sol-payins'] = () => `${banner('payins-hero.webp', 'Accept payments globally with local payment methods')}
 <p class="lead">Accept payments online across emerging markets using trusted local payment methods. Improve approval rates and deliver seamless checkout experiences with PayFuture’s payment processing infrastructure.</p>
 ${media('Payin-infographic_.webp', 'Built for businesses expanding into emerging markets', `<h2>Built for businesses expanding into emerging markets</h2><p>Reaching customers in emerging markets means going beyond cards. PayFuture connects you to <b>2.5bn+ potential shoppers</b> through the most local payment methods — helping you offer trusted, region-specific checkout experiences that drive conversions, reduce drop-offs, and increase approval rates.</p>`)}
 <h2>Grow globally with local payment experiences</h2>
@@ -101,7 +101,7 @@ ${feat([
 <div class="callout"><p><b>Build it:</b> <a href="#/guide/payouts">Payouts &amp; prefunding</a> · <a href="#/guide/quickstart-payout">Quickstart: first payout</a></p></div>
 ${srcLine(WEB.payouts, 'payfuture.net/solutions/payouts')}`;
 
-G['sol-crossborder'] = () => `${banner('crossborder-hero.png', 'Cross-border payment solutions for global businesses')}
+G['sol-crossborder'] = () => `${banner('crossborder-hero.webp', 'Cross-border payment solutions for global businesses')}
 <p class="lead">Our cross-border payments solution enables businesses to enter and scale in emerging markets by supporting compliant cross-border fund movement in local markets. Built for reliable execution, PayFuture supports seamless commercial flows across high-growth regions.</p>
 <h2>The challenges merchants face when scaling internationally</h2>
 <ul><li>Many traditional providers struggle with local compliance in emerging markets</li><li>Regulatory complexity and settlement delays</li><li>Limited liquidity and unpredictable operational timelines</li></ul>
@@ -146,10 +146,10 @@ ${table(['Without regulated stablecoin infrastructure', 'With PayFuture'], [
   ['Compliance gaps in new corridors', 'Globally regulated infrastructure'],
   ['No visibility into fund movement', 'Blockchain-transparent, on-chain confirmation'],
 ])}
-${fig('Stablecoin-hero-image-3.png', 'Speed, compliance, and control across every corridor', 'pf-wide')}
+${fig('Stablecoin-hero-image-3.webp', 'Speed, compliance, and control across every corridor', 'pf-wide')}
 ${srcLine(WEB.stablecoin, 'payfuture.net/solutions/stablecoin-cross-border-payments')}`;
 
-G['sol-mass'] = () => `${banner('mass-hero.jpg', 'Global mass payments for high-volume disbursements')}
+G['sol-mass'] = () => `${banner('mass-hero.webp', 'Global mass payments for high-volume disbursements')}
 <p class="lead">Send payments to thousands of recipients across multiple markets in a single execution — compliantly, efficiently, and without operational friction.</p>
 <p>Global mass payments consolidate disbursements to many recipients, countries and currencies into one structured batch — reducing time, cost and manual effort. Businesses rely on them for vendor settlements, partner commissions, supplier payments, affiliate payouts and workforce disbursements.</p>
 <h2>Who uses it</h2>
@@ -167,7 +167,7 @@ ${feat([
 <ol class="steps"><li><b>Upload</b>Recipient list, amounts, currencies and documentation, through the platform or API.</li><li><b>Validate</b>Check payment details, confirm FX rates and review compliance flags.</li><li><b>Execute</b>PayFuture processes the batch across corridors and reports settlement status for the whole run.</li></ol>
 ${srcLine(WEB.mass, 'payfuture.net/solutions/global-mass-payments')}`;
 
-G['sol-optimisation'] = () => `${banner('optimisation-hero.png', 'Optimise every transaction for higher approvals')}
+G['sol-optimisation'] = () => `${banner('optimisation-hero.webp', 'Optimise every transaction for higher approvals')}
 <p class="lead">Boost approval rates and reduce lost revenue with data-driven authorisation strategies designed for emerging markets.</p>
 <p>Authorisation failures are a key source of revenue leakage. PayFuture combines intelligent routing, smart retry logic, adaptive authentication and real-time monitoring to recover more transactions — and convert more customers.</p>
 <h2>Strategies that power higher approval rates</h2>
@@ -214,8 +214,8 @@ ${feat([
 ])}
 <h2>Live corridors</h2>
 <div class="grid2">
-  <div class="tile"><div class="pf-corridor">${fig('Chinese-flag-1.png', 'China')}<span>→</span>${fig('India-flag.png', 'India')}</div><b>China → India</b><span>Supplier settlements, treasury transfers and B2B payments.</span></div>
-  <div class="tile"><div class="pf-corridor">${fig('USA-flag.png', 'USA')}<span>→</span>${fig('India-flag.png', 'India')}</div><b>USA → India</b><span>Vendor, supplier and treasury payments.</span></div>
+  <div class="tile"><div class="pf-corridor">${fig('Chinese-flag-1.png', 'China')}<span>→</span>${fig('India-flag.webp', 'India')}</div><b>China → India</b><span>Supplier settlements, treasury transfers and B2B payments.</span></div>
+  <div class="tile"><div class="pf-corridor">${fig('USA-flag.png', 'USA')}<span>→</span>${fig('India-flag.webp', 'India')}</div><b>USA → India</b><span>Vendor, supplier and treasury payments.</span></div>
 </div>
 <h2>Market spotlight: India</h2>
 ${media('payment-upi.svg', 'UPI', `<p>One of the world’s fastest-growing digital economies, with widespread UPI adoption and a mobile-first population. In March 2025 alone, UPI processed over 18.3 billion transactions worth more than ₹27.1 trillion (about USD 325 billion).</p>
@@ -225,7 +225,7 @@ ${srcLine(WEB.countries, 'payfuture.net/countries')} ${srcLine(WEB.home.replace(
 G.industries = () => `<h1>Industries &amp; partners</h1>
 <p class="lead">PayFuture supports businesses across e-commerce, platforms, travel and regulated industries that need reliable online and international payment solutions in emerging markets.</p>
 <div class="pf-cards">${[
-  ['em-img01.png', 'E-learning'], ['em-img02.png', 'Streaming'], ['Travel.png', 'Travel'], ['video-gaming.png', 'Video gaming'], ['Remittance.png', 'Remittance providers'],
+  ['em-img01.webp', 'E-learning'], ['em-img02.webp', 'Streaming'], ['Travel.webp', 'Travel'], ['video-gaming.webp', 'Video gaming'], ['Remittance.webp', 'Remittance providers'],
 ].map(([f, t]) => `<div class="pf-card">${fig(f, t)}<div><b>${t}</b></div></div>`).join('')}</div>
 <p>We also work with money transfer and remittance providers, regulated video streaming providers, shared economy platforms and subscription businesses.</p>
 <h2>Channel partners</h2>

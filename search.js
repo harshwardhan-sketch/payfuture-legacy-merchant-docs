@@ -11,9 +11,10 @@
     webhook: ['callback', 'notificationurl'], callback: ['webhook', 'notificationurl'], notification: ['callback'],
     signature: ['hash', 'signing'], sign: ['hash', 'signing'], signing: ['hash', 'signature'], hash: ['signature', 'signing'], hmac: ['signature'],
     sandbox: ['lpl', 'test'], test: ['lpl', 'testing'], staging: ['lpl'],
+    generator: ['playground'], generate: ['playground'], calculator: ['playground'], tool: ['playground', 'calculator'], debug: ['detective', 'fixing'], playground: ['calculator'],
     status: ['getstatus'], balance: ['getbalance'], refund: ['refunds'], error: ['errors'], errors: ['error'],
   };
-  const POPULAR = ['Payin', 'Payout', 'hash does not match', 'Callbacks', 'Get Status', 'Signature header', 'Test cases', 'Easypaisa', 'Refund', '11031'];
+  const POPULAR = ['Payin', 'Payout', 'hash does not match', 'Hash playground', 'Callbacks', 'Get Status', 'Signature header', 'Test cases', 'Easypaisa', 'Refund', '11031'];
 
   let INDEX = null;
   const lower = s => s.toLowerCase();

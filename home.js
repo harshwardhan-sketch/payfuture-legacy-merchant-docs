@@ -115,7 +115,7 @@ docsHome = function () {
     </div>
     <button class="home-search" type="button" data-search=""><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Search guides, API fields and error codes</span><kbd>/</kbd></button>
   </div>
-  <div class="home-hero-img">${fig('main-banner0002.webp', 'PayFuture')}</div>
+  <div class="home-hero-img"><img class="pf-img" src="${IMG('main-banner0002.webp')}" alt="PayFuture" fetchpriority="high" width="1269" height="777"></div>
 </section>
 <section class="home-stats">
   <div><b>250+</b><span>merchants onboarded</span></div>
@@ -128,7 +128,7 @@ docsHome = function () {
   <h2>Accept and send payments</h2>
   <p class="home-sub">Start with the flow — each page explains how it works, what you send, what your customer sees and what you get back.</p>
   <div class="home-do">
-    <a class="home-do-card" href="#/legacy/payin-flows">${fig('payins-hero.png', 'Pay-ins')}<div><span class="tag">Pay-ins</span><b>Collect payments</b><span>Hosted checkout or seamless: wallets, UPI, cards, bank transfer and deposits — and how each flow completes.</span><em>Explore pay-in flows →</em></div></a>
+    <a class="home-do-card" href="#/legacy/payin-flows">${fig('payins-hero.webp', 'Pay-ins')}<div><span class="tag">Pay-ins</span><b>Collect payments</b><span>Hosted checkout or seamless: wallets, UPI, cards, bank transfer and deposits — and how each flow completes.</span><em>Explore pay-in flows →</em></div></a>
     <a class="home-do-card" href="#/legacy/payout-flows">${fig('payouts-banner.webp', 'Payouts')}<div><span class="tag">Payouts</span><b>Send payouts</b><span>Bank, net banking and wallet payouts from your balance — statuses and why payouts get rejected.</span><em>Explore payout flows →</em></div></a>
   </div>
 </section>
@@ -147,8 +147,8 @@ docsHome = function () {
 <section class="home-sec">
   <h2>PayFuture solutions</h2>
   <div class="pf-cards pf-cards4">${[
-    ['sol-payins', 'Pay-ins', 'payins-hero.png'], ['sol-payouts', 'Payouts', 'payouts-banner.webp'],
-    ['sol-crossborder', 'Cross-border', 'crossborder-hero.png'], ['sol-stablecoin', 'Stablecoin', 'Stablecoin-copy.webp'],
+    ['sol-payins', 'Pay-ins', 'payins-hero.webp'], ['sol-payouts', 'Payouts', 'payouts-banner.webp'],
+    ['sol-crossborder', 'Cross-border', 'crossborder-hero.webp'], ['sol-stablecoin', 'Stablecoin', 'Stablecoin-copy.webp'],
   ].map(([id, t, f]) => `<a class="pf-card" href="#/guide/${id}">${fig(f, t)}<div><b>${t} →</b></div></a>`).join('')}</div>
 </section>
 
