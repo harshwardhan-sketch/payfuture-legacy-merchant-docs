@@ -1,0 +1,169 @@
+/* Docs home + "Payment flows" explainers (pay-in flows, payout flows).
+   Loaded last: overrides docsHome() and adds a "Payment flows" nav group. */
+
+/* ---------- sequence diagram (inline SVG, theme-aware) ---------- */
+let seqN = 0;
+function seq(lanes, msgs, title) {
+  const id = 'arw' + (++seqN), W = 760, top = 64, step = 46;
+  const x = i => 70 + i * ((W - 140) / (lanes.length - 1));
+  const H = top + msgs.length * step + 24;
+  const rows = msgs.map(([a, b, label, kind], i) => {
+    const y = top + 26 + i * step;
+    if (a === b) return `<rect class="seq-note" x="${x(a) - 92}" y="${y - 15}" width="184" height="26" rx="6"/><text class="seq-t" x="${x(a)}" y="${y + 3}" text-anchor="middle">${label}</text>`;
+    const x1 = x(a), x2 = x(b), mid = (x1 + x2) / 2;
+    return `<line class="seq-msg ${kind || ''}" x1="${x1}" y1="${y}" x2="${x2 + (x2 > x1 ? -6 : 6)}" y2="${y}" marker-end="url(#${id})"/>
+      <text class="seq-t" x="${mid}" y="${y - 7}" text-anchor="middle">${i + 1}. ${label}</text>`;
+  }).join('');
+  return `<svg class="flowsvg seq" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title || 'Sequence diagram')}">
+  <defs><marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="seq-head" d="M0 0L10 5L0 10z"/></marker></defs>
+  ${lanes.map((l, i) => `<rect class="${i === 1 ? 'acc' : 'box'}" x="${x(i) - 70}" y="8" width="140" height="36" rx="9"/><text x="${x(i)}" y="31" text-anchor="middle">${l}</text>
+  <line class="seq-life" x1="${x(i)}" y1="44" x2="${x(i)}" y2="${H - 8}"/>`).join('')}
+  ${rows}</svg>`;
+}
+
+const ERR = re => { const e = errorBy('legacy', re); return e ? `<code>${e.ErrorCode}</code> ${esc(e.ErrorMessage)}` : ''; };
+
+/* ---------- Pay-in flows ---------- */
+G['payin-flows'] = () => `<h1>Pay-in flows</h1>
+<p class="lead">A pay-in collects money from your customer into your PayFuture balance. You send one <code>PAYIN</code> request; how the customer completes it depends on the flow you choose and the payment method.</p>
+<div class="grid2">
+  <a class="tile" href="#pf-hosted" data-jump="pf-hosted"><span class="tag">PG_H</span><b>Hosted checkout</b><span>We host the payment page. One request, one redirect — fastest to build, works for every market.</span></a>
+  <a class="tile" href="#pf-seamless" data-jump="pf-seamless"><span class="tag">S</span><b>Seamless (server-to-server)</b><span>You collect the details in your own UI. The customer completes the payment in their wallet, bank or card flow.</span></a>
+</div>
+
+<h2 id="pf-hosted">Hosted checkout flow</h2>
+<p>Send <code>integrationType: "PG_H"</code>. PayFuture returns a <code>checkout_url</code>; the customer chooses a method on our page and pays. You never handle card or wallet details.</p>
+${seq(['Customer', 'Your server', 'PayFuture', 'Bank / wallet'], [
+  [0, 1, 'Clicks “Pay”'],
+  [1, 2, 'PAYIN (PG_H) + hash'],
+  [2, 1, 'checkout_url, status INITIATED', 'res'],
+  [1, 0, 'Redirect to checkout_url', 'res'],
+  [0, 2, 'Picks method and pays'],
+  [2, 3, 'Process payment'],
+  [3, 2, 'Result', 'res'],
+  [2, 0, 'Redirect to your returnUrl', 'res'],
+  [2, 1, 'Callback: APPROVED / DECLINED', 'res'],
+], 'Hosted pay-in sequence')}
+<ul>
+<li><b>Required:</b> <code>returnUrl</code> and <code>notificationUrl</code> in <code>merchantUrl</code>.</li>
+<li><b>Hash:</b> one recipe for every hosted pay-in — <code>SHA256(midcode~merchantrefno~amount~currency~midsecret)</code>.</li>
+<li><b>The return is not proof of payment.</b> Fulfil only on the callback (or a <code>GetStatus</code> that says <code>APPROVED</code>).</li>
+<li>Create a new checkout link for each attempt — don't reuse old links.</li>
+</ul>
+
+<h2 id="pf-seamless">Seamless flows</h2>
+<p>Send <code>integrationType: "S"</code> with a <code>paymentMethod</code> code and <code>paymMethodFields</code>. What happens next depends on the method:</p>
+${seq(['Customer', 'Your server', 'PayFuture', 'Bank / wallet'], [
+  [0, 1, 'Enters wallet / UPI / card details'],
+  [1, 2, 'PAYIN (S) + method fields + hash'],
+  [2, 3, 'Request payment'],
+  [2, 1, 'status PENDING (+ instructions)', 'res'],
+  [3, 0, 'Approval prompt / OTP / QR', 'res'],
+  [0, 3, 'Approves in app or bank'],
+  [3, 2, 'Result', 'res'],
+  [2, 1, 'Callback: APPROVED / DECLINED', 'res'],
+], 'Seamless pay-in sequence')}
+${table(['Flow', 'Where', 'Code', 'What you send', 'What the customer does', 'What you show'], [
+  ['<b>Wallet push</b>', '🇵🇰 Pakistan · 🇪🇬 Egypt · 🇲🇦 Morocco', '<code>EP</code> Easypaisa, <code>JC</code> JazzCash, <code>WT</code> wallet', 'Wallet number (PK: 11 digits, 03…; EG: 010/011/012/015…)', 'Approves the request in their wallet app', '“Approve the payment in your wallet app”'],
+  ['<b>UPI</b>', '🇮🇳 India', 'UPI / UPIQRCode', 'VPA (UPI ID) — or nothing for a QR', 'Approves in any UPI app, or scans the QR', 'The QR from <code>checkout_html</code>, or a waiting screen'],
+  ['<b>Card</b>', '🇳🇬 Nigeria', '<code>CARD</code>', 'Card type, holder, number, expiry, CVV', 'May enter a PIN / OTP or complete 3-D Secure', 'Follow <code>authMode</code>: <a href="#/legacy/op-verify-pin">VerifyPin</a>, <a href="#/legacy/op-verify-otp">VerifyOtp</a>, …'],
+  ['<b>Bank deposit</b>', '🇳🇬 Nigeria', '<code>BD</code>', 'Payer details', 'Transfers to the account you show, before it expires', 'Account details from <code>detailData</code> (number, name, bank, amount, expiry)'],
+  ['<b>Bank transfer</b>', '🇲🇦 Morocco', '<code>BT</code>', 'Account number (24 digits), bank code (MOBTD…), name', 'Pays from their bank', 'Payment instructions; <code>customField2</code> must carry a Base64 proof image'],
+])}
+<div class="callout warn"><p><b>Cards:</b> sending card data to your servers puts you in PCI DSS scope. If you are not PCI compliant, use hosted checkout.</p></div>
+
+<h2>Statuses you will see</h2>
+${LIFECYCLE_SVG}
+${table(['Status', 'Meaning', 'Your action'], [
+  ['<code>INITIATED</code>', 'Created; customer has not paid yet', 'Wait'],
+  ['<code>PENDING</code>', 'With the bank / wallet, or awaiting the customer', 'Wait for the callback; poll <code>GetStatus</code> if it is late'],
+  ['<code>APPROVED</code>', 'Paid — final', 'Fulfil the order'],
+  ['<code>DECLINED</code>', 'Failed, cancelled or expired — final', 'Show the reason; let the customer retry with a new <code>merchantRefNo</code>'],
+])}
+
+<h2>After the pay-in</h2>
+<div class="grid3">
+  <a class="tile" href="#/guide/callbacks"><b>Callbacks →</b><span>Verify the hash, reply HTTP 200, handle duplicates.</span></a>
+  <a class="tile" href="#/guide/refunds"><b>Refunds →</b><span>Refund an approved pay-in by its transaction ID.</span></a>
+  <a class="tile" href="#/guide/reconciliation"><b>Settlement &amp; reconciliation →</b><span>Net settlement to your balance (e.g. INR T+5, PKR T+1, NGN T+3).</span></a>
+</div>
+<h2>Build it</h2>
+<div class="grid3">
+  <a class="tile" href="#/guide/quickstart-payin"><span class="tag">Start</span><b>Quickstart: first pay-in →</b><span>Hosted, five steps.</span></a>
+  <a class="tile" href="#/guide/methods"><span class="tag">Methods</span><b>Methods by country →</b><span>Codes, limits, settlement, demos.</span></a>
+  <a class="tile" href="#/legacy/payin"><span class="tag">API</span><b>Payin reference →</b><span>Every field and real example.</span></a>
+</div>`;
+
+/* nav: "Payment flows" group right after Overview */
+(() => {
+  const i = GUIDE_NAV.findIndex(g => g[0] === 'Overview');
+  GUIDE_NAV.splice(i + 1, 0, ['Payment flows', [['payin-flows', 'Pay-in flows'], ['payout-flows', 'Payout flows']]]);
+})();
+
+/* ---------- docs home ---------- */
+docsHome = function () {
+  const flags = FLAGS_SITE.slice(0, 12);
+  return `
+<section class="home-hero">
+  <div class="home-hero-text">
+    <span class="home-kicker">PayFuture Developer Docs</span>
+    <h1>Payments for emerging markets, through one API</h1>
+    <p>Accept local payment methods and send payouts across South Asia, Africa and the Middle East with the PayFuture Gateway — with guides, real examples and tools for every step.</p>
+    <div class="home-ctas">
+      <a class="btn btn-yellow" href="#/legacy/start">Start integrating</a>
+      <a class="btn btn-ghost" href="#/legacy/payin">API reference</a>
+    </div>
+    <button class="home-search" type="button" data-search=""><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Search guides, API fields and error codes</span><kbd>/</kbd></button>
+  </div>
+  <div class="home-hero-img">${fig('main-banner0002.webp', 'PayFuture')}</div>
+</section>
+<section class="home-stats">
+  <div><b>250+</b><span>merchants onboarded</span></div>
+  <div><b>7</b><span>markets in the Gateway API</span></div>
+  <div><b>70+</b><span>local payment methods</span></div>
+  <div><b>24/7</b><span>transaction monitoring</span></div>
+</section>
+
+<section class="home-sec">
+  <h2>Accept and send payments</h2>
+  <p class="home-sub">Start with the flow — each page explains how it works, what you send, what your customer sees and what you get back.</p>
+  <div class="home-do">
+    <a class="home-do-card" href="#/legacy/payin-flows">${fig('payins-hero.png', 'Pay-ins')}<div><span class="tag">Pay-ins</span><b>Collect payments</b><span>Hosted checkout or seamless: wallets, UPI, cards, bank transfer and deposits — and how each flow completes.</span><em>Explore pay-in flows →</em></div></a>
+    <a class="home-do-card" href="#/legacy/payout-flows">${fig('payouts-banner.webp', 'Payouts')}<div><span class="tag">Payouts</span><b>Send payouts</b><span>Bank, net banking and wallet payouts from your balance — statuses and why payouts get rejected.</span><em>Explore payout flows →</em></div></a>
+  </div>
+</section>
+
+<section class="home-sec">
+  <h2>From kickoff to live in five stages</h2>
+  <div class="home-stages">${[
+    ['1', 'Before you start', 'Details, IP whitelisting, credentials', 'stage-1'],
+    ['2', 'Build', 'Requests, hashes, callbacks', 'build-rules'],
+    ['3', 'Test', '14 test cases on LPL', 'testing'],
+    ['4', 'Sign-off', 'QA, finance and both teams', 'go-live'],
+    ['5', 'Go live', 'New LP MID, first live payment', 'production'],
+  ].map(([n, t, d, id]) => `<a href="#/legacy/${id}"><span class="home-num">${n}</span><b>${t}</b><span>${d}</span></a>`).join('')}</div>
+</section>
+
+<section class="home-sec">
+  <h2>PayFuture solutions</h2>
+  <div class="pf-cards pf-cards4">${[
+    ['sol-payins', 'Pay-ins', 'payins-hero.png'], ['sol-payouts', 'Payouts', 'payouts-banner.webp'],
+    ['sol-crossborder', 'Cross-border', 'crossborder-hero.png'], ['sol-stablecoin', 'Stablecoin', 'Stablecoin-copy.webp'],
+  ].map(([id, t, f]) => `<a class="pf-card" href="#/guide/${id}">${fig(f, t)}<div><b>${t} →</b></div></a>`).join('')}</div>
+</section>
+
+<section class="home-sec">
+  <h2>Where we operate</h2>
+  <div class="home-flags">${flags.map(([n, f]) => `<span>${fig(f, n)}${n}</span>`).join('')}</div>
+  <p class="home-sub"><a href="#/legacy/methods">Methods by country →</a></p>
+</section>
+
+<section class="home-help">
+  <div><h2>Need help?</h2><p>Your integration group on Telegram is the fastest route. Tech Integration Support <b>@TechIntegration_Support</b> (Mon–Fri 03:30–21:30 CET) · Customer Success <b>@PFMSupportVA_bot</b> (Mon–Fri 08:00–20:00 CET).</p></div>
+  <a class="btn btn-yellow" href="#/legacy/support">How to raise an issue</a>
+</section>
+<footer class="home-foot">
+  <img src="assets/logo.svg" alt="PayFuture">
+  <span>${ext(WEB.home, 'payfuture.net')} · ${ext(WEB.contact, 'Contact')} · ${ext(WEB.terms, 'Terms')} · ${ext(WEB.privacy, 'Privacy')}</span>
+</footer>`;
+};
