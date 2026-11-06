@@ -51,7 +51,7 @@
       let {parts} = chunks(html);
       /* the error list is indexed code by code below; keep only the intro of that page */
       if (sec === 'legacy' && id === 'errors') parts = parts.filter(p => !p.head).map(p => ({head: '', text: p.text.slice(0, 260)}));
-      const url = `#/${sec}/${id}`;
+      const url = id ? `#/${sec}/${id}` : `#/${sec}`;
       /* the page itself (title + intro) */
       const intro = parts.find(p => !p.head);
       docs.push({kind: 'page', url, title, area, head: '', text: intro ? intro.text : '', all: lower(`${title} ${intro ? intro.text : ''}`)});
@@ -59,6 +59,7 @@
     };
     if (typeof GUIDE_NAV !== 'undefined') GUIDE_NAV.forEach(([, items]) => items.forEach(([id, t]) => add('guide', id, t, 'About PayFuture', () => G[id]())));
     nav('legacy').forEach(([g, items]) => items.forEach(([id, t]) => add('legacy', id, t, /^API reference/.test(g) ? 'API reference' : 'Integration guide', () => resolve('legacy', id)())));
+    if (LG.playground) add('playground', '', 'Hash playground', 'Hash playground', () => LG.playground());
     D.legacy.errors.forEach(e => {
       const msg = e.ErrorMessage || '';
       docs.push({kind: 'error', url: `#/legacy/errors/${encodeURIComponent(e.ErrorCode)}`, title: `Error ${e.ErrorCode}`, area: 'Error codes', head: '', text: msg + (e.v1ErrorCode ? ` (v1 ${e.v1ErrorCode})` : ''),

@@ -241,7 +241,7 @@ ${table(['Country', 'Method', 'Rules'], [
 ])}
 <h2>Limits and settlement</h2>
 ${table(['Market', 'Method', 'Min', 'Max', 'Settlement'], (PD.payoutSpecsTable || []).map(r => [r.market, esc(r.method), r.min, r.max, r.settlement]))}
-<p class="src">Product defaults from ${ext(OFFER_LEG, 'the product offering')}. Your limits sheet (Stage 1) is authoritative for your MIDs.</p>`;
+<p class="src">Product defaults. Your limits sheet (Stage 1) is authoritative for your MIDs.</p>`;
 
 LG.methods = () => {
   const M = methodMatrix();

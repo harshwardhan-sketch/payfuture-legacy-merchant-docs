@@ -15,16 +15,35 @@ const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${
 
 /* Product offering pages (payfuture-technologies.github.io/product-offering → coverage.payfuture.net).
    Their spec data (assets/product-data.js) is synced from the product Google Sheet. */
-const OFFER = 'https://coverage.payfuture.net/';
-const OFFER_LEG = OFFER + 'checkout-demos.html';
-const PD = typeof PRODUCT_DATA !== 'undefined' ? PRODUCT_DATA : {payinMethods: {}, payinMethodsP2P: {}, payoutSpecsTable: [], collectionsSpecs: {}, remittancePayoutSpecs: {}};
+/* No provider, wallet-brand or bank names on this site: the product sheet's rows are renamed to the method
+   names the live API docs (document.paygate10.com) use, and markets those docs don't cover are left out. */
+const PROVIDER_RE = /fawry|vodafone|orange|etisalat|we ?cash|cashplus|cash plus|mt cash|gcash|maya|nagad|bkash|instapay|ozow|attijari|cih|lbanka|bcp|bank of africa|qr ph/i;
+const PD = (() => {
+  const raw = typeof PRODUCT_DATA !== 'undefined' ? PRODUCT_DATA : {payinMethods: {}, payinMethodsP2P: {}, payoutSpecsTable: [], collectionsSpecs: {}, remittancePayoutSpecs: {}};
+  const LIVE_MARKETS = ['IN', 'PK', 'NG', 'EG', 'MA', 'BD', 'PH'];
+  const NAME = {'Fawry': 'Cash voucher', 'QR PH': 'QR', 'UPI QR': 'UPI QR code', 'Wallets': 'Wallet', 'Mobile Wallet': 'Wallet', 'Nagad': 'Wallet', 'bKash': 'Wallet', 'Bank deposit': 'Bank Deposit'};
+  const SUB = {'Cash voucher': 'Pay in cash at a retail outlet', 'Wallet': 'Mobile wallet', 'Bank Transfer': 'Direct from local banks', 'QR': 'Scan to pay from a banking or wallet app'};
+  const CHANNEL = {'Cash voucher': 'Retail cash network', 'Wallet': 'Local mobile wallets', 'Bank Transfer': 'Local banks', 'QR': 'QR-enabled banking and wallet apps'};
+  const clean = (v, fallback) => v && PROVIDER_RE.test(v) ? fallback : v;
+  const method = m => {
+    const name = NAME[m.name] || m.name, cap = {...(m.cap || {})};
+    cap.channels = clean(cap.channels, CHANNEL[name] || 'Local network');
+    cap.speed = cap.speed && cap.speed.replace(/\s*via\s+\w+/i, '');
+    cap.fieldsRequired = clean(cap.fieldsRequired, 'Mobile number');
+    return {name, sub: clean(m.sub, SUB[name] || ''), cap};
+  };
+  const list = arr => arr.map(method).filter((m, i, a) => a.findIndex(x => x.name === m.name) === i); /* e.g. two wallet brands → one Wallet row */
+  const pick = o => Object.fromEntries(Object.entries(o || {}).filter(([cc]) => LIVE_MARKETS.includes(cc)).map(([cc, arr]) => [cc, list(arr)]));
+  const PAYOUT = {'Net Banking (Bank Transfer)': 'Net Banking', 'Easypaisa & JazzCash Wallet': 'EasyPaisa / JazzCash wallet'};
+  return {...raw, payinMethods: pick(raw.payinMethods), payinMethodsP2P: pick(raw.payinMethodsP2P),
+    payoutSpecsTable: (raw.payoutSpecsTable || []).map(r => ({...r, method: PAYOUT[r.method] || (/wallet/i.test(r.method) ? 'Wallet' : r.method)}))};
+})();
 const ISO = {India: 'IN', Pakistan: 'PK', Egypt: 'EG', Nigeria: 'NG', Morocco: 'MA', Bangladesh: 'BD', Philippines: 'PH', 'South Africa': 'ZA'};
 const NAME_OF = Object.fromEntries(Object.entries(ISO).map(([n, c]) => [c, n]));
-const demoUrl = (cc, m) => m.demoSrc ? OFFER + m.demoSrc : m.demoTarget ? `${OFFER}checkout-flow/index.html?country=${cc}&method=${m.demoTarget}` : '';
 function specTable(cc, list) {
-  return `<table><thead><tr><th>Method</th><th>Channels</th><th>Speed</th><th>Min</th><th>Max</th><th>Settlement</th><th>Integration</th><th>Demo</th></tr></thead><tbody>${
-    list.map(m => { const c = m.cap || {}, u = demoUrl(cc, m);
-      return `<tr><td><b>${esc(m.name)}</b><span class="cond-note">${esc(m.sub || '')}</span></td><td>${esc(c.channels || '—')}</td><td>${esc(c.speed || '—')}</td><td>${esc(c.minTx || '—')}</td><td>${esc(c.maxTx || c.depositLimits || '—')}</td><td>${esc(c.settlement || '—')}</td><td>${esc(c.integrationType || '—')}</td><td>${u ? `<a href="${u}" target="_blank" rel="noopener">Try ↗</a>` : '—'}</td></tr>`; }).join('')
+  return `<table><thead><tr><th>Method</th><th>Channels</th><th>Speed</th><th>Min</th><th>Max</th><th>Settlement</th><th>Integration</th></tr></thead><tbody>${
+    list.map(m => { const c = m.cap || {};
+      return `<tr><td><b>${esc(m.name)}</b><span class="cond-note">${esc(m.sub || '')}</span></td><td>${esc(c.channels || '—')}</td><td>${esc(c.speed || '—')}</td><td>${esc(c.minTx || '—')}</td><td>${esc(c.maxTx || c.depositLimits || '—')}</td><td>${esc(c.settlement || '—')}</td><td>${esc(c.integrationType || '—')}</td></tr>`; }).join('')
   }</tbody></table>`;
 }
 const kv = rows => table(['', ''], rows.map(r => [`<b>${esc(r.label)}</b>`, esc(r.value)]));
@@ -156,7 +175,7 @@ G.reconciliation = () => `<h1>Balance &amp; reconciliation</h1>
 
 G['hash-help'] = () => `<h1>Fixing hash errors</h1>
 <p class="lead">“hash does not match” is the most common integration error. It almost always comes from one of the causes below.</p>
-<div class="callout ok"><p><b>Fastest fix:</b> paste your hash into the <a href="#/legacy/playground">hash playground</a>. Its hash detective tries every cause below and tells you which one it is.</p></div>
+<div class="callout ok"><p><b>Fastest fix:</b> paste your hash into the <a href="#/playground">hash playground</a>. Its hash detective tries every cause below and tells you which one it is.</p></div>
 ${table(['Cause', 'How to spot it', 'Fix'], [
   ['<b>Wrong recipe</b>', 'You used the hosted recipe for a seamless request, or another method\'s recipe.', 'Recipes differ per request type, mode, method and country. Copy the exact one from your platform\'s API reference.'],
   ['<b>Fields in the wrong order</b>', 'Same fields, different order.', 'Follow the recipe order exactly — e.g. some recipes place <code>midsecret</code> in the middle.'],
@@ -382,7 +401,7 @@ ${table(['Include', 'Example'], [
 ])}
 <div class="callout warn"><p>Please don't post passwords, MID secrets or customers' personal data in the group. Our team will never ask for your passwords in chat.</p></div>
 <h2>PayFuture website</h2>
-<p>${ext(WEB.home, 'payfuture.net')} · ${ext(WEB.about, 'About')} · ${ext(WEB.solutions, 'Solutions')} · ${ext(WEB.countries, 'Countries')} · ${ext(WEB.industries, 'Industries')} · ${ext(OFFER_LEG, 'Product offering: Gaming, Forex & P2P')} · ${ext(WEB.newsroom, 'Newsroom')}</p>
+<p>${ext(WEB.home, 'payfuture.net')} · ${ext(WEB.about, 'About')} · ${ext(WEB.solutions, 'Solutions')} · ${ext(WEB.countries, 'Countries')} · ${ext(WEB.industries, 'Industries')} · ${ext(WEB.newsroom, 'Newsroom')}</p>
 <p>${ext(WEB.terms, 'Terms and conditions')} · ${ext(WEB.privacy, 'Privacy policy')} · ${ext(WEB.cookies, 'Cookies')}</p>`;
 
 /* ==========================================================================
@@ -394,14 +413,14 @@ G['legacy-products'] = () => {
   const ccs = Object.keys(PD.payinMethods);
   const p2p = PD.payinMethodsP2P || {};
   return `<h1>Legacy: Gaming, Forex &amp; P2P</h1>
-<p class="lead">Collect payments from your end users, pay funds out to your end users, and settle your own fee. ${ext(OFFER_LEG, 'Interactive product page')}</p>
+<p class="lead">Collect payments from your end users, pay funds out to your end users, and settle your own fee.</p>
 ${stageRow([
   ['Accept', 'Accept payments across emerging markets using local payment methods your customers already trust.'],
   ['Disburse', 'Send fast, secure, localised payouts to customers, sellers, partners and vendors.'],
   ['Settle', 'Once a pay-in is approved, fees, refunds and chargebacks are deducted to calculate the net settlement amount, reflected in your available balance in near real time. You request a transfer to your settlement account from the back office. Currently available for INR (T+5), PKR (T+1) and NGN (T+3).'],
 ])}
 <h2>Pay-in methods by country</h2>
-<p>Commercial specs per method. <b>Try ↗</b> opens a live checkout demo.</p>
+<p>Commercial specs per method.</p>
 ${ccs.map(cc => `<div class="country"><h3>${FLAGS[NAME_OF[cc]] || ''} ${NAME_OF[cc] || cc}</h3>${specTable(cc, PD.payinMethods[cc])}
   ${p2p[cc] ? `<h4>P2P merchants</h4>${specTable(cc, p2p[cc])}<p class="src">P2P fees: ${p2p[cc].map(m => `${esc(m.name)} — ${esc((m.cap || {}).fees || '—')}`).join(' · ')}</p>` : ''}</div>`).join('')}
 <h2>Payouts</h2>

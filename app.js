@@ -195,7 +195,7 @@ P.signing = f => {
     <a class="tile" href="#" data-jump="hmac"><span class="tag">One method for all requests</span><b>Option A · Signature header</b><span>Sign the whole request body with HMAC-SHA256 and send it in the <code>X-Callback-Signature</code> header. The same code works for every request type.</span></a>
     <a class="tile" href="#" data-jump="body-hash"><span class="tag">Per request type</span><b>Option B · Body hash</b><span>Join specific fields with <code>~</code>, add your secret and send the SHA-256 in the <code>hash</code> field. Each request type has its own field order.</span></a>
   </div>
-  <div class="callout ok"><p><b>New: <a href="#/${f}/playground">Hash playground</a>.</b> Build a hash piece by piece, sign a body with HMAC, and let the hash detective tell you why yours doesn't match.</p></div>
+  <div class="callout ok"><p><b>New: <a href="#/playground">Hash playground</a>.</b> Build a hash piece by piece, sign a body with HMAC, and let the hash detective tell you why yours doesn't match.</p></div>
   <div class="callout"><p><b>Callbacks carry a body hash.</b> When PayFuture calls your <code>notificationUrl</code>, check its <a href="#" data-jump="callback-recipes">callback hash</a>, whichever option you use to sign your requests.</p></div>
 
   <section id="hmac"><h2>Option A · Signature header (HMAC)</h2>
@@ -322,12 +322,20 @@ function resolve(flow, id) {
   if (id === 'errors') return arg => errorsPage(flow, arg ? decodeURIComponent(arg) : '');
   return P[id] ? () => P[id](flow) : null;
 }
+/* phones hide the header tabs, so the slide-out menu repeats them at the top */
+const mobileTabs = () => `<div class="mtabs">${[...document.querySelectorAll('#switch a')].map(a => `<a href="${a.getAttribute('href')}" data-tab="${a.dataset.tab}">${a.textContent}</a>`).join('')}</div>`;
 /* Sections: '' = docs home, 'guide' = About PayFuture pages, 'legacy' = Legacy guide + API reference (legacy.js). */
 function render() {
   const [, sec, id, arg] = (location.hash || '#/').split('/');
   document.body.classList.remove('menu');
-  const setTab = tab => document.querySelectorAll('#switch a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
+  const setTab = tab => document.querySelectorAll('#switch a, .mtabs a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
   setTab(null);
+  /* the hash playground is its own top-level tab: a full-width tool page without a side menu */
+  if (sec === 'legacy' && id === 'playground') { location.replace('#/playground'); return; }
+  if (sec === 'playground' && typeof LG !== 'undefined' && LG.playground) {
+    app.innerHTML = `<div class="layout solo" data-sec="playground"><nav class="side">${mobileTabs()}</nav><main>${LG.playground()}</main></div>`;
+    setTab('playground'); document.title = 'Hash playground · PayFuture Docs'; window.scrollTo(0, 0); afterRender('playground'); return;
+  }
   const isGuide = sec === 'guide' && typeof GUIDE_NAV !== 'undefined';
   if (!isGuide && !D[sec]) {
     app.innerHTML = typeof docsHome === 'function' ? docsHome() : landing();
@@ -358,10 +366,11 @@ function render() {
   }
   const sideTop = isGuide ? '' : `<div class="side-product">${FLOW_NAME[sec]} <small>PayFuture Gateway · IG</small></div>`;
   app.innerHTML = `<div class="layout" data-sec="${sec}">
-    <nav class="side">${sideTop}<input id="navFilter" type="search" placeholder="Filter this menu" aria-label="Filter the menu by page title">
+    <nav class="side">${mobileTabs()}${sideTop}<input id="navFilter" type="search" placeholder="Filter this menu" aria-label="Filter the menu by page title">
       ${groups.map(([g, items]) => `<h4>${g}</h4>${items.map(([pid, t]) => `<a href="#/${sec}/${pid}" class="${pid === cur[0] ? 'on' : ''}">${t}</a>`).join('')}`).join('')}
     </nav>
     <main><div class="crumb">${label === cur[2] ? label : `${label} · ${cur[2]}`}</div>${body}${pager}</main></div>`;
+  setTab(isGuide ? 'about' : /^API reference/.test(cur[2]) ? 'api' : 'docs'); /* again, for the menu's own tab row */
   document.title = label2;
   window.scrollTo(0, 0);
   afterRender(cur[0], arg);

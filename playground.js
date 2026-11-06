@@ -160,7 +160,4 @@ ${tabs([
     b.textContent = 'Copied ✓'; b.classList.add('done'); setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('done'); }, 1200);
   });
 
-  /* menu entry: Build → after "Signing & hash calculator" */
-  const build = LEGACY_GUIDE_NAV.find(([g]) => g === 'Build')[1];
-  build.splice(build.findIndex(([id]) => id === 'signing') + 1, 0, ['playground', 'Hash playground']);
 })();

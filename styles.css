@@ -537,3 +537,14 @@ details.faq[open]>:not(summary){animation:pfUp .25s ease-out}
 }
 .theme-switching,.theme-switching *,.theme-switching *::before,.theme-switching *::after{transition:none!important}
 main.enter>.flash,main.enter>section>.flash{animation:pfFlash 1.8s ease-out}
+
+/* full-width tool page (hash playground tab) */
+.layout.solo{grid-template-columns:minmax(0,1fr);max-width:1080px}
+.mtabs{display:none}
+.layout.solo nav.side{display:none}
+@media (max-width:900px){
+  .mtabs{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 14px;margin-bottom:10px;border-bottom:1px solid var(--border)}
+  .mtabs a{padding:6px 12px;border-radius:999px;border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--muted)}
+  .mtabs a.on{background:var(--brand-navy);border-color:var(--brand-navy);color:#fff}
+  body.menu .layout.solo nav.side{display:block}
+}
