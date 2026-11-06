@@ -26,7 +26,7 @@ const LEGACY_MARKETS = () => Object.entries(methodMatrix())
 const legacyOnly = o => Object.values(o).filter(x => x.flows.has(LF));
 
 /* ---------- Welcome ---------- */
-LG.start = () => `<div class="pf-banner">${fig('payins-hero.webp', 'PayFuture Gateway')}<div class="pf-banner-text"><h1>Legacy · PayFuture Gateway</h1><p>Integration guide and API reference for merchants connecting directly to the PayFuture Gateway (IG).</p></div></div>
+LG.start = () => `<div class="pf-banner">${fig('payins-hero.webp', 'PayFuture Gateway')}<div class="pf-banner-text"><h1>PayFuture Gateway</h1><p>Integration guide and API reference for merchants connecting directly to the PayFuture Gateway.</p></div></div>
 <p class="lead">Accept local payments and send payouts across ${LIVE.length} live markets through one endpoint. Built for gaming, forex and P2P merchants.</p>
 <h2>Live markets</h2>
 ${liveFlags()}
@@ -50,7 +50,7 @@ LG['stage-1'] = reuse('before-you-start');
 
 /* ---------- Legacy-specific pages ---------- */
 LG.journey = () => `<h1>Integration journey</h1>
-<p class="lead">Every Legacy integration moves through five stages, from kickoff to live processing. Your integration group on Telegram is where both teams track progress.</p>
+<p class="lead">Every integration moves through five stages, from kickoff to live processing. Your integration group on Telegram is where both teams track progress.</p>
 ${table(['Stage', 'What happens', 'Environment', 'You move on when'], [
   ['<a href="#/legacy/stage-1">1. Before you start</a>', 'We exchange details, documents and credentials', '—', 'You have everything in Stage 1, and your first API call works'],
   ['<a href="#/legacy/build-rules">2. Build</a>', 'You connect to the Gateway API', 'LPL', 'Requests and callbacks work end to end'],

@@ -5,7 +5,7 @@
 
 const D = window.PF_DATA.flows;
 const TC = '<span class="tc">TO CONFIRM</span>';
-const FLOW_NAME = {legacy: 'Legacy'};
+const FLOW_NAME = {legacy: 'PayFuture Gateway'}; /* visible names never use internal terms (Legacy, IG, Enterprise) */
 
 /* ---------- helpers ---------- */
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -351,7 +351,7 @@ function render() {
   const inAll = all.flatMap(([g, items]) => items.map(i => [i[0], g])).find(i => i[0] === id);
   const tab = inAll ? tabOf(inAll[1]) : 'docs';
   const groups = isGuide ? all : all.filter(([g]) => tabOf(g) === tab);
-  const label = isGuide ? 'About PayFuture' : FLOW_NAME[sec];
+  const label = isGuide ? 'About PayFuture' : tab === 'api' ? 'API reference' : 'Integration guide';
   const flat = groups.flatMap(([g, items]) => items.map(i => [...i, g]));
   /* a guide page reachable by link but not listed in the menu still opens (instead of falling back to the first page) */
   const cur = flat.find(i => i[0] === id) || (isGuide && id && G[id] ? [id, id, 'Guides'] : flat[0]);
@@ -363,7 +363,7 @@ function render() {
   setTab(isGuide ? 'about' : tab);
   const layout = app.querySelector('.layout');
   if (layout && layout.dataset.sec === sec + '-' + tab) {
-    layout.querySelector('main').innerHTML = `<div class="crumb">${label === cur[2] ? label : `${label} · ${cur[2]}`}</div>${body}${pager}`;
+    layout.querySelector('main').innerHTML = `<div class="crumb">${label === cur[2] ? label : `${label} · ${cur[2].replace(/^API reference · /, '')}`}</div>${body}${pager}`;
     const side = layout.querySelector('nav.side');
     side.querySelectorAll('a[href^="#/' + sec + '/"]').forEach(a => a.classList.toggle('on', a.getAttribute('href') === `#/${sec}/${cur[0]}`));
     const on = side.querySelector('a.on');
@@ -373,12 +373,12 @@ function render() {
     afterRender(cur[0], arg);
     return;
   }
-  const sideTop = isGuide ? '' : `<div class="side-product">${tab === 'api' ? 'API reference' : 'Integration guide'} <small>PayFuture Gateway · IG</small></div>`;
+  const sideTop = isGuide ? '' : `<div class="side-product">${tab === 'api' ? 'API reference' : 'Integration guide'} <small>PayFuture Gateway</small></div>`;
   app.innerHTML = `<div class="layout" data-sec="${sec}-${tab}">
     <nav class="side">${mobileTabs()}${sideTop}<input id="navFilter" type="search" placeholder="Filter this menu" aria-label="Filter the menu by page title">
       ${groups.map(([g, items]) => `<h4>${g.replace(/^API reference · /, '')}</h4>${items.map(([pid, t]) => `<a href="#/${sec}/${pid}" class="${pid === cur[0] ? 'on' : ''}">${t}</a>`).join('')}`).join('')}
     </nav>
-    <main><div class="crumb">${label === cur[2] ? label : `${label} · ${cur[2]}`}</div>${body}${pager}</main></div>`;
+    <main><div class="crumb">${label === cur[2] ? label : `${label} · ${cur[2].replace(/^API reference · /, '')}`}</div>${body}${pager}</main></div>`;
   setTab(isGuide ? 'about' : tab); /* again, for the menu's own tab row */
   document.title = label2;
   window.scrollTo(0, 0);

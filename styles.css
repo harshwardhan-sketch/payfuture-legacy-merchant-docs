@@ -550,7 +550,7 @@ main.enter>.flash,main.enter>section>.flash{animation:pfFlash 1.8s ease-out}
 }
 
 /* header: About PayFuture opens payfuture.net */
-.about-link{margin-left:14px;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;font-family:var(--font-head)}
+.about-link{margin-left:12px;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;font-family:var(--font-head)}
 .about-link:hover{color:var(--text);text-decoration:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:1100px){.about-link{display:none}}
