@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <title>UPI QR Payment</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="style.css">
+  <!-- MixPanel -->
+  <script type="text/javascript">
+    (function(e,c){if(!c.__SV){var l,h;window.mixpanel=c;c._i=[];c.init=function(q,r,f){function t(d,a){var g=a.split(".");2==g.length&&(d=d[g[0]],a=g[1]);d[a]=function(){d.push([a].concat(Array.prototype.slice.call(arguments,0)))}}var b=c;"undefined"!==typeof f?b=c[f]=[]:f="mixpanel";b.people=b.people||[];b.toString=function(d){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);d||(a+=" (stub)");return a};b.people.toString=function(){return b.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders start_session_recording stop_session_recording people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+    for(h=0;h<l.length;h++)t(b,l[h]);var n="set set_once union unset remove delete".split(" ");b.get_group=function(){function d(p){a[p]=function(){b.push([g,[p].concat(Array.prototype.slice.call(arguments,0))])}}for(var a={},g=["get_group"].concat(Array.prototype.slice.call(arguments,0)),m=0;m<n.length;m++)d(n[m]);return a};c._i.push([q,r,f])};c.__SV=1.2;var k=e.createElement("script");k.type="text/javascript";k.async=!0;k.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===
+    e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=e.getElementsByTagName("script")[0];e.parentNode.insertBefore(k,e)}})(document,window.mixpanel||[]);
+
+    mixpanel.init('0cace38f71171497764700d01148d399', {
+      autocapture: true,
+      record_sessions_percent: 100,
+      api_host: 'https://api-eu.mixpanel.com',
+      batch_requests: false,
+    });
+
+    mixpanel.register({
+      'Provider Region': 'india'
+    });
+  </script>
+</head>
+
+<body class="upi-qr-page">
+
+  <!-- Wrapper Div -->
+  <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 ">
+
+    <!-- White Card -->
+    <div class="bg-card d-flex flex-column justify-content-center align-items-center">
+
+      <!-- Payment Options -->
+      <div class="d-flex flex-column payment-box w-100">
+        <div class="d-flex flex-column align-items-start justify-content-between heading-wrapper gap-24-box w-100">
+        </div>
+        
+        <!-- QR Code View -->
+        <div class="d-flex flex-column form-wrapper gap-32-wrapper">
+          <div class="qr-help-wrapper">
+            <!-- Instruction text -->
+            <p class="qr-instruction-text" data-translate="scan-qr-instruction">Scan the QR using your UPI app and complete the payment within 5 mins.</p>
+          </div>
+          
+          <!-- QR Code Section -->
+          <div class="qr-code-container">
+            <div class="qr-code-wrapper">
+              <img class="qr-code-image qr-code-visible" src="images/dummy-qr.png" alt="UPI QR Code">
+            </div>
+          </div>
+
+          <!-- Mobile-only: payment app shortcuts -->
+          <div id="mobileUpiMethodsDefault" class="mobile-upi-methods-card">
+            <p class="mobile-upi-methods-title">
+              <span data-translate="choose-payment-method">Choose any UPI supported app below to complete payment.</span>
+              <button type="button" class="mobile-how-to-pay-link" data-bs-toggle="modal" data-bs-target="#howToPayModal">
+                <img src="images/bulb.svg" alt="" class="how-to-pay-link-icon">
+                <span data-translate="how-to-pay-link">How to pay</span>
+              </button>
+            </p>
+            <div class="mobile-upi-security-ticker" role="status">
+              <div class="mobile-upi-security-ticker-icon" aria-hidden="true">
+                <img src="images/shield.svg" alt="">
+              </div>
+              <div class="mobile-upi-security-ticker-text">
+                <p class="mobile-upi-security-ticker-line1">
+                  <span data-translate="upi-ticker-line1a">Secured by Automatic Routing. </span><strong data-translate="upi-ticker-line1b">Recipient name in UPI app may vary.</strong>
+                </p>
+              </div>
+            </div>
+            <div class="scroll-down-hint" aria-hidden="true">
+              Scroll for more <img src="images/scrolldown.svg" alt="" class="scroll-down-icon">
+            </div>
+            <button type="button" class="mobile-upi-method-row" data-open-app="paytm">
+              <div class="mobile-upi-method-left">
+                <img src="images/paytm.png" alt="Paytm" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="paytm-app">Paytm</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="phonepe">
+              <div class="mobile-upi-method-left">
+                <img src="images/phonepe2.png" alt="PhonePe" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="phonepe-app">PhonePe</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="gpay">
+              <div class="mobile-upi-method-left">
+                <img src="images/gpay2.png" alt="Google Pay" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="gpay-app">Google Pay</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="bhim">
+              <div class="mobile-upi-method-left">
+                <img src="images/bhim2.png" alt="BHIM" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="bhim-app">BHIM</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="cred">
+              <div class="mobile-upi-method-left">
+                <img src="images/cred.png" alt="CRED" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="cred-app">CRED</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="navi">
+              <div class="mobile-upi-method-left">
+                <img src="images/navi.png" alt="Navi" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="navi-app">Navi</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="supermoney">
+              <div class="mobile-upi-method-left">
+                <img src="images/supermoney.png" alt="Super.money" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="supermoney-app">Super.money</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="amazonpay">
+              <div class="mobile-upi-method-left">
+                <img src="images/amazonpay2.png" alt="Amazon Pay" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="amazonpay-app">Amazon Pay</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row">
+              <div class="mobile-upi-method-left">
+                <img src="images/UPI.png" alt="UPI" class="mobile-upi-method-logo mobile-upi-other-apps-logo">
+                <span class="mobile-upi-method-name" data-translate="other-apps">Other Apps</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- GSX Payin Process for UPI (IND): mobile four app rows (GPay, PhonePe, Paytm deeplinks; Other Apps display-only last) -->
+          <div id="mobileUpiMethodsGsx" class="mobile-upi-methods-card d-none">
+            <p class="mobile-upi-methods-title">
+              <span data-translate="choose-payment-method">Choose any UPI supported app below to complete payment.</span>
+              <button type="button" class="mobile-how-to-pay-link" data-bs-toggle="modal" data-bs-target="#howToPayModal">
+                <img src="images/bulb.svg" alt="" class="how-to-pay-link-icon">
+                <span data-translate="how-to-pay-link">How to pay</span>
+              </button>
+            </p>
+            <div class="mobile-upi-security-ticker" role="status">
+              <div class="mobile-upi-security-ticker-icon" aria-hidden="true">
+                <img src="images/shield.svg" alt="">
+              </div>
+              <div class="mobile-upi-security-ticker-text">
+                <p class="mobile-upi-security-ticker-line1">
+                  <span data-translate="upi-ticker-line1a">Secured by Automatic Routing. </span><strong data-translate="upi-ticker-line1b">Recipient name in UPI app may vary.</strong>
+                </p>
+              </div>
+            </div>
+            <button type="button" class="mobile-upi-method-row" data-open-app="gpay">
+              <div class="mobile-upi-method-left">
+                <img src="images/gpay2.png" alt="Google Pay" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="gpay-app">Google Pay</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="phonepe">
+              <div class="mobile-upi-method-left">
+                <img src="images/phonepe2.png" alt="PhonePe" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="phonepe-app">PhonePe</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row" data-open-app="paytm">
+              <div class="mobile-upi-method-left">
+                <img src="images/paytm.png" alt="Paytm" class="mobile-upi-method-logo">
+                <span class="mobile-upi-method-name" data-translate="paytm-app">Paytm</span>
+              </div>
+            </button>
+            <button type="button" class="mobile-upi-method-row">
+              <div class="mobile-upi-method-left">
+                <img src="images/UPI.png" alt="Other Apps" class="mobile-upi-method-logo mobile-upi-other-apps-logo">
+                <span class="mobile-upi-method-name" data-translate="other-apps">Other Apps</span>
+              </div>
+            </button>
+          </div>
+          
+          <!-- Return Home Button -->
+          <div class="d-flex flex-column gap-16-box w-100">
+            <div class="button-wrapper w-100">
+              <button class="btn btn-primary checkout-button d-flex gap-3 align-items-center justify-content-center w-100" type="button" id="returnHomeButton">
+                <span class="spinner-border spinner-border-sm d-flex align-items-center justify-content-center d-none" id="returnHomeSpinner" aria-hidden="true">
+                  <img class="custom-spinner" src="images/Ellipse-48.png" alt="">
+                </span>
+                <span id="returnHomeButtonText" data-translate="return-home">Return Home</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- We support text -->
+          <p class="support-text" data-translate="we-support-upi">We support all UPI handles</p>
+          
+          <!-- UPI Handles Logos: India XM default (all handles) -->
+          <div id="upiHandlesLogosDefault" class="upi-handles-logos">
+            <img src="images/freecharge.png" alt="Freecharge" class="upi-handle-logo">
+            <img src="images/amazonpay.png" alt="Amazon Pay" class="upi-handle-logo">
+            <img src="images/gpay.png" alt="Google Pay" class="upi-handle-logo" data-open-app="gpay">
+            <img src="images/phonepe.png" alt="PhonePe" class="upi-handle-logo">
+            <img src="images/UPI.png" alt="UPI" class="upi-handle-logo">
+            <img src="images/mobikwik.png" alt="Mobikwik" class="upi-handle-logo">
+            <img src="images/bhim.png" alt="BHIM" class="upi-handle-logo" data-open-app="bhim">
+          </div>
+          <!-- GSX Payin Process for UPI (IND): four-handle logo row (shown when upiQrFlow=gsx) -->
+          <div id="upiHandlesLogosGsx" class="upi-handles-logos upi-handles-logos--four d-none">
+            <img src="images/UPI.png" alt="UPI" class="upi-handle-logo">
+            <img src="images/gpay.png" alt="Google Pay" class="upi-handle-logo" data-open-app="gpay">
+            <img src="images/phonepe.png" alt="PhonePe" class="upi-handle-logo">
+            <img src="images/paytm-handle.png" alt="Paytm" class="upi-handle-logo">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- How to Pay Modal (structure matches Feedback / Cancel modal on index) -->
+  <div class="modal fade" id="howToPayModal" tabindex="-1" aria-labelledby="howToPayModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="howToPayModalLabel" data-translate="how-to-pay-modal-title">How to pay?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ol class="how-to-pay-steps-list">
+            <li data-translate="how-to-pay-step-1">Select your preferred UPI app from the list.</li>
+            <li data-translate="how-to-pay-step-2">Your chosen app will open with payment details pre-filled.</li>
+            <li data-translate="how-to-pay-step-3">Enter your UPI PIN to authorize and complete the payment.</li>
+          </ol>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary feedback-submit-btn" data-bs-dismiss="modal" data-translate="how-to-pay-got-it">Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+  <script src="script.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // GSX Payin Process for UPI (IND): toggle logo row + hide XM header on upi-qr-page
+      if (typeof configureUpiQrPageHandlesLogos === 'function') {
+        configureUpiQrPageHandlesLogos();
+      }
+      const savedLanguage = sessionStorage.getItem('selectedLanguage') || 'en';
+      switchLanguage(savedLanguage);
+
+      // Handle Return Home button
+      const returnHomeButton = document.getElementById('returnHomeButton');
+      if (returnHomeButton) {
+        returnHomeButton.addEventListener('click', function() {
+          if (typeof mixpanel !== 'undefined' && typeof mixpanel.track === 'function') {
+            mixpanel.track('Return Home', { page: 'upi-qr', order_id: (typeof getTrackedOrderId === 'function' ? getTrackedOrderId() : '') });
+          }
+          sessionStorage.setItem('selectedLanguage', 'en');
+          window.location.href = 'index.html';
+        });
+      }
+    });
+  </script>
+
+<script>
+  /* ---- Injected for the Payfuture product page: report this page's
+     real content height to the parent window via postMessage, so the
+     embedding iframe resizes correctly on every page this flow can
+     navigate to (not just the initial accordion list). ---- */
+  (function(){
+    function reportHeight(){
+      var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      if(h > 0 && window.parent){
+        window.parent.postMessage({ source: 'payfuture-checkout-flow', height: h }, '*');
+      }
+    }
+    window.addEventListener('load', function(){
+      reportHeight();
+      [60, 150, 400, 800, 1500].forEach(function(d){ setTimeout(reportHeight, d); });
+      if(window.ResizeObserver){
+        new ResizeObserver(reportHeight).observe(document.body);
+      }
+      document.querySelectorAll('img').forEach(function(img){
+        if(!img.complete){
+          img.addEventListener('load', reportHeight, { once: true });
+          img.addEventListener('error', reportHeight, { once: true });
+        }
+      });
+    });
+  })();
+</script>
+</body>
+
+
+</html>
+

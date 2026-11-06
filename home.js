@@ -90,7 +90,7 @@ ${table(['Status', 'Meaning', 'Your action'], [
 <h2>Build it</h2>
 <div class="grid3">
   <a class="tile" href="#/guide/quickstart-payin"><span class="tag">Start</span><b>Quickstart: first pay-in →</b><span>Hosted, five steps.</span></a>
-  <a class="tile" href="#/guide/methods"><span class="tag">Methods</span><b>Methods by country →</b><span>Codes, limits, settlement, demos.</span></a>
+  <a class="tile" href="#/methods"><span class="tag">Methods</span><b>Payment methods →</b><span>Limits, settlement, demos and videos.</span></a>
   <a class="tile" href="#/legacy/payin"><span class="tag">API</span><b>Payin reference →</b><span>Every field and real example.</span></a>
 </div>`;
 
@@ -102,13 +102,12 @@ ${table(['Status', 'Meaning', 'Your action'], [
 
 /* ---------- docs home ---------- */
 docsHome = function () {
-  const flags = FLAGS_SITE.slice(0, 12);
   return `
 <section class="home-hero">
   <div class="home-hero-text">
     <span class="home-kicker">PayFuture Developer Docs</span>
     <h1>Payments for emerging markets, through one API</h1>
-    <p>Accept local payment methods and send payouts across South Asia, Africa and the Middle East with the PayFuture Gateway — with guides, real examples and tools for every step.</p>
+    <p>Accept local payment methods and send payouts across South Asia, Africa, the Middle East and South-East Asia with the PayFuture Gateway — with guides, real examples and tools for every step.</p>
     <div class="home-ctas">
       <a class="btn btn-yellow" href="#/legacy/start">Start integrating</a>
       <a class="btn btn-ghost" href="#/legacy/payin">API reference</a>
@@ -118,10 +117,10 @@ docsHome = function () {
   <div class="home-hero-img"><img class="pf-img" src="${IMG('main-banner0002.webp')}" alt="PayFuture" fetchpriority="high" width="1269" height="777"></div>
 </section>
 <section class="home-stats">
-  <div><b>250+</b><span>merchants onboarded</span></div>
-  <div><b>7</b><span>markets in the Gateway API</span></div>
-  <div><b>70+</b><span>local payment methods</span></div>
-  <div><b>24/7</b><span>transaction monitoring</span></div>
+  <div><b>${LIVE.length}</b><span>live markets</span></div>
+  <div><b>2</b><span>ways to integrate: hosted or seamless</span></div>
+  <div><b>${D.legacy.recipes.length}</b><span>hash recipes, all testable</span></div>
+  <div><b>${D.legacy.errors.length}</b><span>error codes explained</span></div>
 </section>
 
 <section class="home-sec">
@@ -144,18 +143,12 @@ docsHome = function () {
   ].map(([n, t, d, id]) => `<a href="#/legacy/${id}"><span class="home-num">${n}</span><b>${t}</b><span>${d}</span></a>`).join('')}</div>
 </section>
 
-<section class="home-sec">
-  <h2>PayFuture solutions</h2>
-  <div class="pf-cards pf-cards4">${[
-    ['sol-payins', 'Pay-ins', 'payins-hero.webp'], ['sol-payouts', 'Payouts', 'payouts-banner.webp'],
-    ['sol-crossborder', 'Cross-border', 'crossborder-hero.webp'], ['sol-stablecoin', 'Stablecoin', 'Stablecoin-copy.webp'],
-  ].map(([id, t, f]) => `<a class="pf-card" href="#/guide/${id}">${fig(f, t)}<div><b>${t} →</b></div></a>`).join('')}</div>
-</section>
 
 <section class="home-sec">
-  <h2>Where we operate</h2>
-  <div class="home-flags">${flags.map(([n, f]) => `<span>${fig(f, n)}${n}</span>`).join('')}</div>
-  <p class="home-sub"><a href="#/legacy/methods">Methods by country →</a></p>
+  <h2>Live markets</h2>
+  <p class="home-sub">Pick a market for its payment methods, limits, a live checkout demo and an end-to-end video.</p>
+  ${liveFlags()}
+  <p class="home-sub"><a href="#/methods">Explore payment methods →</a></p>
 </section>
 
 <section class="home-help">

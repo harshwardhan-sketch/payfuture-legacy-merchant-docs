@@ -17,7 +17,9 @@
 
   /* cards ease in when they first scroll into view (only those below the fold, so nothing visible blinks) */
   const SEL = '.tile,.card,.home-do-card,.home-stages a,.home-stats>div,.pf-cards>*,.grid4>*,.pg,.calc,.ex';
+  let ioAlive = false; /* IntersectionObserver always reports once per element; if it never does, show everything */
   const io = 'IntersectionObserver' in window && !reduce ? new IntersectionObserver(es => es.forEach(e => {
+    ioAlive = true;
     if (!e.isIntersecting) return;
     e.target.classList.add('in'); io.unobserve(e.target);
   }), {rootMargin: '0px 0px -40px 0px'}) : null;
@@ -46,6 +48,8 @@
       el.style.setProperty('--d', Math.min(n, 4) * 60 + 'ms');
       el.classList.add('rv'); io.observe(el);
     });
+    ioAlive = false;
+    setTimeout(() => { if (!ioAlive) document.querySelectorAll('#app .rv:not(.in)').forEach(el => el.classList.add('in')); }, 1200);
     document.querySelectorAll('#app .home-stats b').forEach(countUp);
   });
 })();

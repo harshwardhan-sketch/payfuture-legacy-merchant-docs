@@ -1,5 +1,5 @@
-/* Copied from https://coverage.payfuture.net/data.js (PayFuture product offering pages, synced there from the product Google Sheet).
-   Refresh: curl -sSL https://coverage.payfuture.net/data.js -o assets/product-data.js (then re-add this header). */
+/* Copied from https://github.com/payfuture-technologies/product-offering (coverage.payfuture.net, being sunset).
+   That page is retired; this file is now the source for the Payment methods tab. */
 /* ==========================================================================
    PRODUCT_DATA — single source of truth for the tabular/spec content on
    this page (payin method tables, payout/collections/remittance spec
@@ -16,6 +16,7 @@ const PRODUCT_DATA = {
   payinMethods: {
     IN: [
       { name: "UPI QR", sub: "Scan to pay via any UPI app", iconKey: "qr", demoTarget: "collapseUPIQR",
+        journey: [{ url: "https://www.youtube.com/watch?v=iWAHVabW_iM" }],
         cap: { speed: "Real-time, 24x7", currency: "INR", integrationType: "S2S, Hosted", channels: "Any UPI app via QR scan", fieldsRequired: "UPI ID / VPA", depositLimits: "Min INR 100 / Max INR 10,000 per transaction; daily cap INR 50,000,000", minTx: "INR 100", maxTx: "INR 10,000 per transaction", settlement: "T+4 working days", fx: "Local currency, no FX required", notes: "Ideal for in-person or checkout page QR flows." } }
     ],
     NG: [
@@ -24,12 +25,15 @@ const PRODUCT_DATA = {
     ],
     EG: [
       { name: "Fawry", sub: "Cash", iconKey: "cash", demoTarget: "collapseCashMethod",
+        journey: [{ url: "https://www.youtube.com/watch?v=htWOTI4LIjM" }],
         cap: { speed: "Up to 24h (cash network)", currency: "EGP", integrationType: "Hosted", channels: "Fawry retail network nationwide", fieldsRequired: "Account number, account name, transaction reference", depositLimits: "Max EGP 100,000 per transaction", minTx: "EGP 10", maxTx: "EGP 100,000", settlement: "T+5 working days", fx: "Local currency, no FX required", notes: "Reaches unbanked and cash-preferring customers." } },
       { name: "Wallets", sub: "Etisalat, Vodafone, Wecash, Orange", iconKey: "wallet", demoTarget: "collapseWalletEgyptMethod",
+        journey: [{ url: "https://www.youtube.com/watch?v=SGOD2db_zBw" }],
         cap: { speed: "Real-time", currency: "EGP", integrationType: "Hosted, S2S", channels: "Etisalat, Vodafone, Wecash, Orange", fieldsRequired: "Wallet/mobile number (e.g. 010XXXXXXXXX)", depositLimits: "EGP 60,000 per transaction; EGP 150,000 monthly cap", minTx: "EGP 10", maxTx: "EGP 100,000", settlement: "T+3 working days", fx: "Local currency, no FX required", notes: "Popular with mobile-first shoppers." } }
     ],
     PK: [
       { name: "Easypaisa", sub: "Mobile wallet", iconKey: "phone", demoTarget: "collapseEasypaisa",
+        journey: [{ url: "https://www.youtube.com/watch?v=4gXFJARohog" }],
         cap: { speed: "Real-time", currency: "PKR", integrationType: "Hosted, S2S", channels: "Easypaisa wallet network", fieldsRequired: "Mobile number (11 digits, e.g. 03XXXXXXXXX)", depositLimits: "PKR 500–50,000 per transaction", minTx: "PKR 500", maxTx: "PKR 50,000", settlement: "T+1 working day", fx: "Local currency, no FX required", notes: "One of Pakistan's most-used mobile wallets." } },
       { name: "JazzCash", sub: "Mobile wallet", iconKey: "phone", demoTarget: "collapseJazzCash",
         cap: { speed: "Real-time", currency: "PKR", integrationType: "Hosted, S2S", channels: "JazzCash wallet network", fieldsRequired: "Mobile number (11 digits, e.g. 03XXXXXXXXX)", depositLimits: "PKR 100–200,000 per transaction", minTx: "PKR 100", maxTx: "PKR 200,000", settlement: "T+1 working day", fx: "Local currency, no FX required", notes: "Second major Pakistani mobile wallet." } }
@@ -44,16 +48,20 @@ const PRODUCT_DATA = {
       { name: "Bank Transfer", sub: "Direct from Philippine banks", iconKey: "bank", demoTarget: "collapsePhilippinesVcaBankTransfer",
         cap: { speed: "Real-time via InstaPay", currency: "PHP", integrationType: "Hosted", channels: "Philippine banks via InstaPay", fx: "Local currency, no FX required", notes: "Uses a unique Virtual Collection Account per transaction." } },
       { name: "Wallets", sub: "Local mobile wallets", iconKey: "wallet", demoTarget: "collapseDfnnWallets",
+        journey: [{ label: "Watch GCash journey", url: "https://www.youtube.com/watch?v=muQz94pXrDY" }, { label: "Watch Maya journey", url: "https://www.youtube.com/watch?v=Gl6Ry7o8d_E" }],
         cap: { speed: "Real-time", currency: "PHP", integrationType: "Hosted", channels: "GCash, Maya", fieldsRequired: "Wallet selection (GCash/Maya), mobile number (e.g. 09XXXXXXXXX)", depositLimits: "Payin: Min PHP 100 / Max PHP 50,000", minTx: "PHP 100", maxTx: "PHP 50,000", settlement: "T+1 working day", fx: "Local currency, no FX required", notes: "The Philippines' two leading e-wallets." } }
     ],
     BD: [
       { name: "Nagad", sub: "Mobile wallet", iconKey: "phone", demoTarget: "collapseBanWallets",
+        journey: [{ url: "https://www.youtube.com/watch?v=iTdRuZs5Q6U" }],
         cap: { speed: "Real-time", currency: "BDT", channels: "Nagad wallet network", fieldsRequired: "Mobile number (11 digits, e.g. 01XXXXXXXXX)", minTx: "BDT 100", maxTx: "BDT 50,000 per transaction", settlement: "T+1 working day", fx: "Local currency, no FX required", notes: "Government-backed mobile financial service." } },
       { name: "bKash", sub: "Mobile wallet", iconKey: "phone", demoTarget: "collapseBanWallets",
+        journey: [{ url: "https://www.youtube.com/watch?v=iTdRuZs5Q6U" }],
         cap: { speed: "Real-time", currency: "BDT", channels: "bKash wallet network", fieldsRequired: "Mobile number (11 digits, e.g. 01XXXXXXXXX)", minTx: "BDT 100", maxTx: "BDT 50,000 per transaction", settlement: "T+1 working day", fx: "Local currency, no FX required", notes: "Bangladesh's largest mobile wallet." } }
     ],
     MA: [
       { name: "Mobile Wallet", sub: "CashPlus, Orange Money, MT Cash", iconKey: "wallet", demoSrc: "morocco-wallet-flow/index.html",
+        journey: [{ url: "https://www.youtube.com/watch?v=bd9j7-nQcjI" }],
         cap: { speed: "Real-time", currency: "MAD", integrationType: "Hosted, S2S", channels: "CashPlus, Orange Money, MT Cash", fieldsRequired: "Wallet number, wallet name", depositLimits: "Min MAD 50 / Max MAD 5,000 per transaction", minTx: "MAD 50", maxTx: "MAD 5,000 per transaction", settlement: "T+5 working days", fx: "Local currency, no FX required", notes: "Reaches mobile-first and unbanked customers across Morocco." } },
       { name: "Bank Transfer", sub: "Attijariwafa, CIH, BCP, Bank Of Africa & more", iconKey: "bank", demoSrc: "morocco-bank-flow/index.html",
         cap: { speed: "Real-time", currency: "MAD", integrationType: "Hosted, S2S", channels: "Attijariwafa, CIH Bank, Lbanka Lik, BCP, Bank Of Africa", fieldsRequired: "Account number, account name", depositLimits: "Min MAD 100 / Max MAD 20,000 per transaction", minTx: "MAD 100", maxTx: "MAD 20,000 per transaction", settlement: "T+5 working days", fx: "Local currency, no FX required", notes: "Well suited to higher-value transactions." } }
@@ -67,6 +75,7 @@ const PRODUCT_DATA = {
       { name: "Bank Deposit", sub: "Direct from any Egyptian bank", iconKey: "bank", demoSrc: "egypt-p2p-flow/index.html",
         cap: { speed: "Real-time", currency: "EGP", integrationType: "S2S", channels: "All Egyptian banks", fieldsRequired: "Account number, account name, proof-of-payment upload", depositLimits: "EGP 1,000–100,000 per transaction", minTx: "EGP 1,000", maxTx: "EGP 100,000", settlement: "T+5 working days", fees: "Deposit: 7.50%", fx: "Local currency, no FX required" } },
       { name: "Wallets", sub: "Orange Cash, Etisalat, We Cash, Vodafone", iconKey: "wallet", demoSrc: "egypt-p2p-flow/index.html?method=wallet",
+        journey: [{ url: "https://www.youtube.com/watch?v=V3i6OEbkiWU" }],
         cap: { speed: "Real-time", currency: "EGP", integrationType: "Hosted, S2S", channels: "Orange Cash, Etisalat, We Cash, Vodafone", fieldsRequired: "Wallet/mobile number, proof-of-payment upload", depositLimits: "EGP 500–60,000 per transaction", minTx: "EGP 500", maxTx: "EGP 60,000", settlement: "T+5 working days", fees: "Deposit (e-wallet): 5.25%", fx: "Local currency, no FX required" } }
     ]
   },

@@ -11,7 +11,7 @@
     webhook: ['callback', 'notificationurl'], callback: ['webhook', 'notificationurl'], notification: ['callback'],
     signature: ['hash', 'signing'], sign: ['hash', 'signing'], signing: ['hash', 'signature'], hash: ['signature', 'signing'], hmac: ['signature'],
     sandbox: ['lpl', 'test'], test: ['lpl', 'testing'], staging: ['lpl'],
-    generator: ['playground'], generate: ['playground'], calculator: ['playground'], tool: ['playground', 'calculator'], debug: ['detective', 'fixing'], playground: ['calculator'],
+    generator: ['playground'], generate: ['playground'], calculator: ['playground'], tool: ['playground', 'calculator'], debug: ['detective', 'fixing'], playground: ['calculator'], demo: ['methods'], video: ['methods'], limits: ['methods'], settlement: ['settlements'], gaming: ['methods'], forex: ['methods'], p2p: ['methods'],
     status: ['getstatus'], balance: ['getbalance'], refund: ['refunds'], error: ['errors'], errors: ['error'],
   };
   const POPULAR = ['Payin', 'Payout', 'hash does not match', 'Hash playground', 'Callbacks', 'Get Status', 'Signature header', 'Test cases', 'Easypaisa', 'Refund', '11031'];
@@ -60,6 +60,7 @@
     if (typeof GUIDE_NAV !== 'undefined') GUIDE_NAV.forEach(([, items]) => items.forEach(([id, t]) => add('guide', id, t, 'About PayFuture', () => G[id]())));
     nav('legacy').forEach(([g, items]) => items.forEach(([id, t]) => add('legacy', id, t, /^API reference/.test(g) ? 'API reference' : 'Integration guide', () => resolve('legacy', id)())));
     if (LG.playground) add('playground', '', 'Hash playground', 'Hash playground', () => LG.playground());
+    if (typeof PM !== 'undefined') add('methods', '', 'Payment methods', 'Payment methods', () => PM.indexHtml());
     D.legacy.errors.forEach(e => {
       const msg = e.ErrorMessage || '';
       docs.push({kind: 'error', url: `#/legacy/errors/${encodeURIComponent(e.ErrorCode)}`, title: `Error ${e.ErrorCode}`, area: 'Error codes', head: '', text: msg + (e.v1ErrorCode ? ` (v1 ${e.v1ErrorCode})` : ''),

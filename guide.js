@@ -11,16 +11,22 @@ const WEB = {
   authopt: SITE + '/solutions/authorisation-optimisation/', reporting: SITE + '/solutions/reporting-and-analytics/',
   newsroom: SITE + '/newsroom/', privacy: SITE + '/privacy-policy/', terms: SITE + '/terms-and-conditions/', cookies: SITE + '/cookies/',
 };
+const IMG = f => `assets/site/${f}`;
+const fig = (f, alt, cls = '') => `<img class="pf-img ${cls}" src="${IMG(f)}" alt="${esc(alt)}" loading="lazy">`;
+/* live markets (Confluence "Legacy: Live Countries Summary") with flag and currency */
+const LIVE = [['India', '🇮🇳', 'INR'], ['Pakistan', '🇵🇰', 'PKR'], ['Egypt', '🇪🇬', 'EGP'], ['Nigeria', '🇳🇬', 'NGN'], ['Morocco', '🇲🇦', 'MAD'], ['Philippines', '🇵🇭', 'PHP']];
+const liveFlags = () => `<div class="home-flags">${LIVE.map(([n, f, c]) => `<a href="#/methods"><span class="flag" aria-hidden="true">${f}</span>${n} · ${c}</a>`).join('')}</div>`;
 const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ↗</a>`;
 
 /* Product offering pages (payfuture-technologies.github.io/product-offering → coverage.payfuture.net).
    Their spec data (assets/product-data.js) is synced from the product Google Sheet. */
 /* No provider, wallet-brand or bank names on this site: the product sheet's rows are renamed to the method
-   names the live API docs (document.paygate10.com) use, and markets those docs don't cover are left out. */
+   names the live API docs (document.paygate10.com) use. Markets: only those live per Confluence
+   "Legacy: Live Countries Summary" (PMA 1638170625, checked 6 Nov 2026): IN, PK, EG, NG, MA, PH. */
 const PROVIDER_RE = /fawry|vodafone|orange|etisalat|we ?cash|cashplus|cash plus|mt cash|gcash|maya|nagad|bkash|instapay|ozow|attijari|cih|lbanka|bcp|bank of africa|qr ph/i;
 const PD = (() => {
   const raw = typeof PRODUCT_DATA !== 'undefined' ? PRODUCT_DATA : {payinMethods: {}, payinMethodsP2P: {}, payoutSpecsTable: [], collectionsSpecs: {}, remittancePayoutSpecs: {}};
-  const LIVE_MARKETS = ['IN', 'PK', 'NG', 'EG', 'MA', 'BD', 'PH'];
+  const LIVE_MARKETS = ['IN', 'PK', 'NG', 'EG', 'MA', 'PH'];
   const NAME = {'Fawry': 'Cash voucher', 'QR PH': 'QR', 'UPI QR': 'UPI QR code', 'Wallets': 'Wallet', 'Mobile Wallet': 'Wallet', 'Nagad': 'Wallet', 'bKash': 'Wallet', 'Bank deposit': 'Bank Deposit'};
   const SUB = {'Cash voucher': 'Pay in cash at a retail outlet', 'Wallet': 'Mobile wallet', 'Bank Transfer': 'Direct from local banks', 'QR': 'Scan to pay from a banking or wallet app'};
   const CHANNEL = {'Cash voucher': 'Retail cash network', 'Wallet': 'Local mobile wallets', 'Bank Transfer': 'Local banks', 'QR': 'QR-enabled banking and wallet apps'};
@@ -30,13 +36,15 @@ const PD = (() => {
     cap.channels = clean(cap.channels, CHANNEL[name] || 'Local network');
     cap.speed = cap.speed && cap.speed.replace(/\s*via\s+\w+/i, '');
     cap.fieldsRequired = clean(cap.fieldsRequired, 'Mobile number');
-    return {name, sub: clean(m.sub, SUB[name] || ''), cap};
+    /* demos and journey videos are kept (approved: they may show brands); our own labels stay generic */
+    const journey = (m.journey || []).map((j, i, a) => ({url: j.url, label: j.label && !PROVIDER_RE.test(j.label) ? j.label : a.length > 1 ? `Watch end-to-end journey ${i + 1}` : 'Watch end-to-end journey'}));
+    return {name, sub: clean(m.sub, SUB[name] || ''), cap, demoSrc: m.demoSrc, demoTarget: m.demoTarget, journey};
   };
   const list = arr => arr.map(method).filter((m, i, a) => a.findIndex(x => x.name === m.name) === i); /* e.g. two wallet brands → one Wallet row */
   const pick = o => Object.fromEntries(Object.entries(o || {}).filter(([cc]) => LIVE_MARKETS.includes(cc)).map(([cc, arr]) => [cc, list(arr)]));
   const PAYOUT = {'Net Banking (Bank Transfer)': 'Net Banking', 'Easypaisa & JazzCash Wallet': 'EasyPaisa / JazzCash wallet'};
   return {...raw, payinMethods: pick(raw.payinMethods), payinMethodsP2P: pick(raw.payinMethodsP2P),
-    payoutSpecsTable: (raw.payoutSpecsTable || []).map(r => ({...r, method: PAYOUT[r.method] || (/wallet/i.test(r.method) ? 'Wallet' : r.method)}))};
+    payoutSpecsTable: (raw.payoutSpecsTable || []).filter(r => LIVE_MARKETS.some(cc => ({IN: 'India', PK: 'Pakistan', NG: 'Nigeria', EG: 'Egypt', MA: 'Morocco', PH: 'Philippines'})[cc] === r.market)).map(r => ({...r, method: PAYOUT[r.method] || (/wallet/i.test(r.method) ? 'Wallet' : r.method)}))};
 })();
 const ISO = {India: 'IN', Pakistan: 'PK', Egypt: 'EG', Nigeria: 'NG', Morocco: 'MA', Bangladesh: 'BD', Philippines: 'PH', 'South Africa': 'ZA'};
 const NAME_OF = Object.fromEntries(Object.entries(ISO).map(([n, c]) => [c, n]));
@@ -140,7 +148,7 @@ G.seamless = () => `<h1>Seamless (server-to-server)</h1>
 <p class="lead">Collect the payment details in your own UI and send them with <code>integrationType: "S"</code>, a <code>paymentMethod</code> code and <code>paymMethodFields</code>.</p>
 <h2>How it works</h2>
 <ol class="steps">
-<li><b>Choose the method</b>Use the <code>paymentMethod</code> code for the country — see <a href="#/guide/methods">Methods by country</a>.</li>
+<li><b>Choose the method</b>Use the <code>paymentMethod</code> code for the country — see <a href="#/guide/methods">Payment methods</a>.</li>
 <li><b>Send method fields</b>For example a wallet number for Easypaisa / JazzCash, a VPA for UPI, card fields for cards.</li>
 <li><b>Use the method's hash recipe</b>Seamless recipes differ per method and country — copy the exact one from the API reference.</li>
 <li><b>Complete any verification</b>Some flows return an <code>authMode</code>; continue with <code>VerifyPin</code>, <code>VerifyOtp</code>, <code>VerifyPhone</code> or <code>VerifyAddress</code> (see the Others section of the API reference).</li>
@@ -404,27 +412,5 @@ ${table(['Include', 'Example'], [
 <p>${ext(WEB.home, 'payfuture.net')} · ${ext(WEB.about, 'About')} · ${ext(WEB.solutions, 'Solutions')} · ${ext(WEB.countries, 'Countries')} · ${ext(WEB.industries, 'Industries')} · ${ext(WEB.newsroom, 'Newsroom')}</p>
 <p>${ext(WEB.terms, 'Terms and conditions')} · ${ext(WEB.privacy, 'Privacy policy')} · ${ext(WEB.cookies, 'Cookies')}</p>`;
 
-/* ==========================================================================
-   Products — from the PayFuture product offering pages (coverage.payfuture.net)
-   ========================================================================== */
-const stageRow = stages => `<ol class="steps">${stages.map(([t, d]) => `<li><b>${t}</b>${d}</li>`).join('')}</ol>`;
 
-G['legacy-products'] = () => {
-  const ccs = Object.keys(PD.payinMethods);
-  const p2p = PD.payinMethodsP2P || {};
-  return `<h1>Legacy: Gaming, Forex &amp; P2P</h1>
-<p class="lead">Collect payments from your end users, pay funds out to your end users, and settle your own fee.</p>
-${stageRow([
-  ['Accept', 'Accept payments across emerging markets using local payment methods your customers already trust.'],
-  ['Disburse', 'Send fast, secure, localised payouts to customers, sellers, partners and vendors.'],
-  ['Settle', 'Once a pay-in is approved, fees, refunds and chargebacks are deducted to calculate the net settlement amount, reflected in your available balance in near real time. You request a transfer to your settlement account from the back office. Currently available for INR (T+5), PKR (T+1) and NGN (T+3).'],
-])}
-<h2>Pay-in methods by country</h2>
-<p>Commercial specs per method.</p>
-${ccs.map(cc => `<div class="country"><h3>${FLAGS[NAME_OF[cc]] || ''} ${NAME_OF[cc] || cc}</h3>${specTable(cc, PD.payinMethods[cc])}
-  ${p2p[cc] ? `<h4>P2P merchants</h4>${specTable(cc, p2p[cc])}<p class="src">P2P fees: ${p2p[cc].map(m => `${esc(m.name)} — ${esc((m.cap || {}).fees || '—')}`).join(' · ')}</p>` : ''}</div>`).join('')}
-<h2>Payouts</h2>
-${table(['Market', 'Method', 'Integration', 'Min', 'Max', 'Settlement', 'Fields required'], (PD.payoutSpecsTable || []).map(r => [r.market, esc(r.method), r.integration, r.min, r.max, r.settlement, esc(r.fieldsRequired)]))}
-<p>Build it: <a href="#/guide/hosted">Hosted checkout</a> · <a href="#/guide/seamless">Seamless</a> · <a href="#/legacy/overview">Legacy API reference</a></p>`;
-};
 

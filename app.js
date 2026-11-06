@@ -323,25 +323,34 @@ function resolve(flow, id) {
   return P[id] ? () => P[id](flow) : null;
 }
 /* phones hide the header tabs, so the slide-out menu repeats them at the top */
-const mobileTabs = () => `<div class="mtabs">${[...document.querySelectorAll('#switch a')].map(a => `<a href="${a.getAttribute('href')}" data-tab="${a.dataset.tab}">${a.textContent}</a>`).join('')}</div>`;
+const mobileTabs = () => `<div class="mtabs">${[...document.querySelectorAll('#switch a')].map(a => `<a href="${a.getAttribute('href')}" data-tab="${a.dataset.tab}">${a.textContent}</a>`).join('')}<a href="https://www.payfuture.net/" target="_blank" rel="noopener">About PayFuture ↗</a></div>`;
 /* Sections: '' = docs home, 'guide' = About PayFuture pages, 'legacy' = Legacy guide + API reference (legacy.js). */
 function render() {
   const [, sec, id, arg] = (location.hash || '#/').split('/');
   document.body.classList.remove('menu');
   const setTab = tab => document.querySelectorAll('#switch a, .mtabs a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
   setTab(null);
-  /* the hash playground is its own top-level tab: a full-width tool page without a side menu */
-  if (sec === 'legacy' && id === 'playground') { location.replace('#/playground'); return; }
-  if (sec === 'playground' && typeof LG !== 'undefined' && LG.playground) {
-    app.innerHTML = `<div class="layout solo" data-sec="playground"><nav class="side">${mobileTabs()}</nav><main>${LG.playground()}</main></div>`;
-    setTab('playground'); document.title = 'Hash playground · PayFuture Docs'; window.scrollTo(0, 0); afterRender('playground'); return;
+  /* old links: the playground and the methods/products pages are now their own tabs; company pages live on payfuture.net */
+  const MOVED = {'legacy/playground': '#/playground', 'legacy/methods': '#/methods', 'legacy/products': '#/methods'};
+  if (MOVED[sec + '/' + id]) { location.replace(MOVED[sec + '/' + id]); return; }
+  if (sec === 'guide') { location.replace('#/'); return; }
+  /* full-width tool pages without a side menu */
+  const SOLO = {playground: ['Hash playground', () => LG.playground()], methods: ['Payment methods', () => PM.page()]};
+  if (SOLO[sec]) {
+    app.innerHTML = `<div class="layout solo" data-sec="${sec}"><nav class="side">${mobileTabs()}</nav><main>${SOLO[sec][1]()}</main></div>`;
+    setTab(sec); document.title = SOLO[sec][0] + ' · PayFuture Docs'; window.scrollTo(0, 0); afterRender(sec); return;
   }
   const isGuide = sec === 'guide' && typeof GUIDE_NAV !== 'undefined';
   if (!isGuide && !D[sec]) {
     app.innerHTML = typeof docsHome === 'function' ? docsHome() : landing();
     document.title = 'PayFuture Developer Docs'; window.scrollTo(0, 0); afterRender('home'); return;
   }
-  const groups = isGuide ? GUIDE_NAV : nav(sec);
+  /* each header tab has its own side menu: the Integration guide never lists API reference pages, and vice versa */
+  const tabOf = g => /^API reference/.test(g) ? 'api' : 'docs';
+  const all = isGuide ? GUIDE_NAV : nav(sec);
+  const inAll = all.flatMap(([g, items]) => items.map(i => [i[0], g])).find(i => i[0] === id);
+  const tab = inAll ? tabOf(inAll[1]) : 'docs';
+  const groups = isGuide ? all : all.filter(([g]) => tabOf(g) === tab);
   const label = isGuide ? 'About PayFuture' : FLOW_NAME[sec];
   const flat = groups.flatMap(([g, items]) => items.map(i => [...i, g]));
   /* a guide page reachable by link but not listed in the menu still opens (instead of falling back to the first page) */
@@ -351,9 +360,9 @@ function render() {
   const pager = `<div class="pager">${prev ? `<a href="#/${sec}/${prev[0]}"><small>Previous</small>${prev[1]}</a>` : '<span></span>'}${next ? `<a href="#/${sec}/${next[0]}" style="text-align:right"><small>Next</small>${next[1]}</a>` : ''}</div>`;
   const label2 = `${cur[1]} · ${label} · PayFuture Docs`;
   /* Same section already on screen: swap only the content, so the left menu keeps its scroll position. */
-  setTab(isGuide ? 'about' : /^API reference/.test(cur[2]) ? 'api' : 'docs');
+  setTab(isGuide ? 'about' : tab);
   const layout = app.querySelector('.layout');
-  if (layout && layout.dataset.sec === sec) {
+  if (layout && layout.dataset.sec === sec + '-' + tab) {
     layout.querySelector('main').innerHTML = `<div class="crumb">${label === cur[2] ? label : `${label} · ${cur[2]}`}</div>${body}${pager}`;
     const side = layout.querySelector('nav.side');
     side.querySelectorAll('a[href^="#/' + sec + '/"]').forEach(a => a.classList.toggle('on', a.getAttribute('href') === `#/${sec}/${cur[0]}`));
@@ -364,13 +373,13 @@ function render() {
     afterRender(cur[0], arg);
     return;
   }
-  const sideTop = isGuide ? '' : `<div class="side-product">${FLOW_NAME[sec]} <small>PayFuture Gateway · IG</small></div>`;
-  app.innerHTML = `<div class="layout" data-sec="${sec}">
+  const sideTop = isGuide ? '' : `<div class="side-product">${tab === 'api' ? 'API reference' : 'Integration guide'} <small>PayFuture Gateway · IG</small></div>`;
+  app.innerHTML = `<div class="layout" data-sec="${sec}-${tab}">
     <nav class="side">${mobileTabs()}${sideTop}<input id="navFilter" type="search" placeholder="Filter this menu" aria-label="Filter the menu by page title">
-      ${groups.map(([g, items]) => `<h4>${g}</h4>${items.map(([pid, t]) => `<a href="#/${sec}/${pid}" class="${pid === cur[0] ? 'on' : ''}">${t}</a>`).join('')}`).join('')}
+      ${groups.map(([g, items]) => `<h4>${g.replace(/^API reference · /, '')}</h4>${items.map(([pid, t]) => `<a href="#/${sec}/${pid}" class="${pid === cur[0] ? 'on' : ''}">${t}</a>`).join('')}`).join('')}
     </nav>
     <main><div class="crumb">${label === cur[2] ? label : `${label} · ${cur[2]}`}</div>${body}${pager}</main></div>`;
-  setTab(isGuide ? 'about' : /^API reference/.test(cur[2]) ? 'api' : 'docs'); /* again, for the menu's own tab row */
+  setTab(isGuide ? 'about' : tab); /* again, for the menu's own tab row */
   document.title = label2;
   window.scrollTo(0, 0);
   afterRender(cur[0], arg);
@@ -396,7 +405,7 @@ function afterRender(pageId, arg) {
   m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
   /* wrap tables so they fill the frame and scroll sideways on small screens */
   document.querySelectorAll('#app table').forEach(t => { if (!t.parentElement.classList.contains('tw')) { const w = document.createElement('div'); w.className = 'tw'; t.replaceWith(w); w.appendChild(t); } });
-  if (pageId === 'signing') initCalc(document.querySelector('.layout')?.dataset.sec, arg);
+  if (pageId === 'signing') initCalc(document.querySelector('.layout')?.dataset.sec.split('-')[0], arg);
   if (pageId === 'errors') filterErrors();
   document.dispatchEvent(new CustomEvent('pf:rendered', {detail: {pageId, arg}}));
 }

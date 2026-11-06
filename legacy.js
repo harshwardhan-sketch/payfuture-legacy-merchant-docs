@@ -8,15 +8,16 @@ const LG = {};
 
 /* guide page id → Legacy page id */
 const TO_LEGACY = {
-  'how-it-works': 'how-it-works', 'legacy-products': 'products', products: 'products', 'payin-flows': 'payin-flows', 'payout-flows': 'payout-flows',
+  'how-it-works': 'how-it-works', 'payin-flows': 'payin-flows', 'payout-flows': 'payout-flows',
   onboarding: 'journey', 'before-you-start': 'stage-1', 'quickstart-payin': 'quickstart-payin', 'quickstart-payout': 'quickstart-payout',
-  'build-rules': 'build-rules', hosted: 'hosted', seamless: 'seamless', payouts: 'payouts-guide', methods: 'methods',
+  'build-rules': 'build-rules', hosted: 'hosted', seamless: 'seamless', payouts: 'payouts-guide', 
   callbacks: 'callbacks', refunds: 'refunds', reconciliation: 'reconciliation', testing: 'testing', 'go-live': 'go-live',
   production: 'production', 'after-go-live': 'after-go-live', 'hash-help': 'hash-help', faq: 'faq', support: 'support', choose: 'start',
 };
 const relink = html => html
   .replace(/#\/guide\/([a-z0-9-]+)/g, (m, id) => TO_LEGACY[id] ? `#/legacy/${TO_LEGACY[id]}` : m)
-  .replace(/#\/legacy\/overview\b/g, '#/legacy/start');
+  .replace(/#\/legacy\/overview\b/g, '#/legacy/start')
+  .replace(/#\/(guide|legacy)\/(methods|products|legacy-products)\b/g, '#/methods');
 const reuse = id => () => relink(G[id]());
 
 const LEGACY_MARKETS = () => Object.entries(methodMatrix())
@@ -25,19 +26,11 @@ const LEGACY_MARKETS = () => Object.entries(methodMatrix())
 const legacyOnly = o => Object.values(o).filter(x => x.flows.has(LF));
 
 /* ---------- Welcome ---------- */
-LG.start = () => {
-  const mk = LEGACY_MARKETS();
-  const flag = c => (FLAGS_SITE.find(f => f[0] === c) || [])[1];
-  return `<div class="pf-banner">${fig('payins-hero.webp', 'PayFuture Gateway')}<div class="pf-banner-text"><h1>Legacy · PayFuture Gateway</h1><p>Integration guide and API reference for merchants connecting directly to the PayFuture Gateway (IG).</p></div></div>
-<p class="lead">Accept local payments and send payouts across ${mk.length} emerging markets through one endpoint. Built for gaming, forex, P2P and e-commerce merchants.</p>
-<div class="home-stats" style="padding:0;margin:0 0 8px">
-  <div><b>${mk.length}</b><span>markets</span></div>
-  <div><b>${Object.values(methodMatrix()).reduce((n, v) => n + legacyOnly(v.payin).length + legacyOnly(v.payout).length, 0)}</b><span>documented method flows</span></div>
-  <div><b>${D.legacy.recipes.length}</b><span>hash recipes, all testable</span></div>
-  <div><b>${D.legacy.errors.length}</b><span>error codes</span></div>
-</div>
-<h2>Markets</h2>
-<div class="home-flags">${mk.map(c => `<a href="#/legacy/methods" style="color:inherit"><span>${flag(c) ? fig(flag(c), c) : ''}${c} · ${CCY[c] || ''}</span></a>`).join('')}</div>
+LG.start = () => `<div class="pf-banner">${fig('payins-hero.webp', 'PayFuture Gateway')}<div class="pf-banner-text"><h1>Legacy · PayFuture Gateway</h1><p>Integration guide and API reference for merchants connecting directly to the PayFuture Gateway (IG).</p></div></div>
+<p class="lead">Accept local payments and send payouts across ${LIVE.length} live markets through one endpoint. Built for gaming, forex and P2P merchants.</p>
+<h2>Live markets</h2>
+${liveFlags()}
+<p>Methods, limits, demos and videos for each market are in <a href="#/methods">Payment methods</a>.</p>
 <h2>Connection details</h2>
 ${table(['Setting', 'Value'], [
   ['Production endpoint', `<code>${esc(prodUrl(LF) || '')}</code>`],
@@ -49,13 +42,11 @@ ${table(['Setting', 'Value'], [
 <h2>Before you start</h2>
 <p>Read <a href="#/legacy/how-it-works">How payments work</a> for the core ideas, then follow the <a href="#/legacy/journey">integration journey</a>. Every page ends with a link to the next one.</p>
 <p class="src">Migrating from PG10? See <a href="#/legacy/pg10">PG10 compatibility</a>. Source of the API content: ${ext('https://document.paygate10.com/', 'document.paygate10.com')}.</p>`;
-};
 
 /* ---------- Reused generic pages (relinked to this section) ---------- */
 ['how-it-works', 'payin-flows', 'build-rules', 'seamless', 'callbacks', 'reconciliation', 'go-live', 'production', 'after-go-live']
   .forEach(id => { LG[id] = reuse(id); });
 LG['stage-1'] = reuse('before-you-start');
-LG.products = reuse('legacy-products');
 
 /* ---------- Legacy-specific pages ---------- */
 LG.journey = () => `<h1>Integration journey</h1>
@@ -168,7 +159,7 @@ ${code(`{
 
 LG.hosted = () => {
   const M = methodMatrix();
-  const rows = Object.entries(M).map(([c, v]) => [`${FLAGS[c] || ''} ${c}`, legacyOnly(v.payin).filter(x => x.mode === 'Hosted').map(x => esc(x.name)).join('<br>')]).filter(r => r[1]);
+  const rows = Object.entries(M).filter(([c]) => LIVE.some(l => l[0] === c)).map(([c, v]) => [`${FLAGS[c] || ''} ${c}`, legacyOnly(v.payin).filter(x => x.mode === 'Hosted').map(x => esc(x.name)).join('<br>')]).filter(r => r[1]);
   return `<h1>Hosted checkout</h1>
 <p class="lead">Send one <code>PAYIN</code> with <code>integrationType: "PG_H"</code>; we return a <code>checkout_url</code> where the customer picks a method and pays.</p>
 <h2>When to use it</h2><ul><li>The fastest integration.</li><li>No card or wallet details touch your systems.</li><li>We show the methods available in the customer's country.</li></ul>
@@ -236,28 +227,10 @@ ${table(['Country', 'Method', 'Rules'], [
   ['🇪🇬 Egypt', 'Bank transfer / deposit', 'Account number (up to 24), account name, bank code'],
   ['🇲🇦 Morocco', 'Bank transfer', '24-digit account number; bank code starting MOBT; account name'],
   ['🇲🇦 Morocco', 'Wallet', '10-digit number starting 06 or 07; bank code starting MOW; account name'],
-  ['🇧🇩 Bangladesh', 'Wallet', '11-digit number starting 01; bank code'],
   ['🇵🇭 Philippines', 'Wallet', '11-digit number starting 09; bank code; account name'],
 ])}
 <h2>Limits and settlement</h2>
-${table(['Market', 'Method', 'Min', 'Max', 'Settlement'], (PD.payoutSpecsTable || []).map(r => [r.market, esc(r.method), r.min, r.max, r.settlement]))}
-<p class="src">Product defaults. Your limits sheet (Stage 1) is authoritative for your MIDs.</p>`;
-
-LG.methods = () => {
-  const M = methodMatrix();
-  const rows = o => legacyOnly(o).map(x => `<tr><td>${esc(x.name)}</td><td>${x.mode}</td><td>${x.code ? `<code>${esc(x.code)}</code>` : '—'}</td></tr>`).join('');
-  const mk = LEGACY_MARKETS();
-  return `<h1>Methods by country</h1>
-<p class="lead">What you can accept and pay out in each market, with the <code>paymentMethod</code> code for seamless requests, limits and settlement.</p>
-<p>${mk.map(c => `<a class="pill2" href="#" data-jump="c-${c}">${FLAGS[c] || ''} ${c}</a>`).join('')}</p>
-${mk.map(c => `<div class="country" id="c-${c}"><h3>${FLAGS[c] || ''} ${c} <span class="pill2">${CCY[c] || ''}</span></h3>
-  ${legacyOnly(M[c].payin).length ? `<h4>Pay-ins</h4><table><thead><tr><th>Method</th><th>Mode</th><th>Code</th></tr></thead><tbody>${rows(M[c].payin)}</tbody></table>` : ''}
-  ${legacyOnly(M[c].payout).length ? `<h4>Payouts</h4><table><thead><tr><th>Method</th><th>Mode</th><th>Code</th></tr></thead><tbody>${rows(M[c].payout)}</tbody></table>` : ''}
-  ${PD.payinMethods[ISO[c]] ? `<h4>Pay-in limits, speed &amp; settlement</h4>${specTable(ISO[c], PD.payinMethods[ISO[c]])}` : ''}
-  ${(PD.payoutSpecsTable || []).some(r => r.market === c) ? `<h4>Payout limits &amp; settlement</h4>${table(['Method', 'Min', 'Max', 'Settlement', 'Fields required'], PD.payoutSpecsTable.filter(r => r.market === c).map(r => [esc(r.method), r.min, r.max, r.settlement, esc(r.fieldsRequired)]))}` : ''}
-</div>`).join('')}
-<p>Hosted pay-ins need no method code — the customer picks on the checkout page. Limits are product defaults; your limits sheet is authoritative.</p>`;
-};
+<p>Payout limits and settlement times per market are in <a href="#/methods">Payment methods → Payouts</a>. Your limits sheet (Stage 1) is authoritative for your MIDs.</p>`;
 
 LG.refunds = () => `<h1>Refunds</h1>
 <p class="lead">Refund an approved pay-in with <code>requestType: "REFUND"</code>, referencing the original <code>transaction_id</code>.</p>
@@ -290,11 +263,10 @@ LG.support = reuse('support');
 
 /* ---------- navigation for the Legacy section (guide first, then API reference) ---------- */
 const LEGACY_GUIDE_NAV = [
-  ['Overview', [['start', 'Welcome'], ['how-it-works', 'How payments work'], ['products', 'Gaming, Forex & P2P']]],
+  ['Overview', [['start', 'Welcome'], ['how-it-works', 'How payments work']]],
   ['Payment flows', [['payin-flows', 'Pay-in flows'], ['payout-flows', 'Payout flows']]],
   ['Get started', [['journey', 'Integration journey'], ['stage-1', 'Stage 1 · Before you start'], ['quickstart-payin', 'Quickstart: first pay-in'], ['quickstart-payout', 'Quickstart: first payout']]],
   ['Build', [['build-rules', 'Stage 2 · Build rules'], ['hosted', 'Hosted checkout'], ['seamless', 'Seamless'], ['payouts-guide', 'Payouts & funding'], ['signing', 'Signing & hash calculator']]],
-  ['Payment methods', [['methods', 'Methods by country']]],
   ['Operations', [['callbacks', 'Callbacks'], ['refunds', 'Refunds'], ['reconciliation', 'Balance & reconciliation']]],
   ['Test and go live', [['testing', 'Stage 3 · Test cases'], ['go-live', 'Stage 4 · Sign-off'], ['production', 'Stage 5 · Production'], ['after-go-live', 'After go-live']]],
   ['Troubleshooting', [['hash-help', 'Fixing hash errors'], ['errors', 'Error codes'], ['faq', 'FAQ'], ['support', 'Support']]],
@@ -314,16 +286,8 @@ resolve = function (flow, id) {
   return _resolve(flow, id);
 };
 
-/* the shared "guide" section now only holds company pages */
-(() => {
-  const keep = new Set(['About PayFuture', 'Solutions']);
-  for (let i = GUIDE_NAV.length - 1; i >= 0; i--) if (!keep.has(GUIDE_NAV[i][0])) GUIDE_NAV.splice(i, 1);
-  /* company pages: send "build it" links into the Legacy guide */
-  ['about', 'solutions', 'markets', 'industries', ...SOLUTIONS.map(s => s[0])].forEach(id => {
-    const f = G[id];
-    G[id] = () => relink(f());
-  });
-})();
+/* company pages are not on this site (About PayFuture opens payfuture.net) */
+GUIDE_NAV.length = 0;
 
 /* home: route remaining generic guide links to the Legacy guide */
 (() => { const h = docsHome; docsHome = () => relink(h()); })();
