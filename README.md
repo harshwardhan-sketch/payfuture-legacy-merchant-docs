@@ -43,3 +43,7 @@ Then open `index.html`, check the changes, and commit. Needs `curl`, `python3` a
 
 Any static host works (GitHub Pages, S3/CloudFront, Netlify, nginx). Upload everything except `REVIEW.md` and `tools/`.
 Never add secrets, MID secrets, prefunding bank details or internal-only information to the site.
+
+## Before every commit
+
+Run `python3 tools/stamp.py`. It adds `?v=<hash>` to every CSS/JS link in index.html so browsers never mix a new page with cached old files (GitHub Pages caches files for 10 minutes). `python3 tools/stamp.py --check` fails if a stamp is stale.
